@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="SubscriptionLogger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">SubscriptionLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SubscriptionLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SubscriptionLoggerHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/primeData/subscription.log</argument>
+        </arguments>
+    </virtualType>
+
+</config>

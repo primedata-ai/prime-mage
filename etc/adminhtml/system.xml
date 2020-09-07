@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="prime_data" translate="label" sortOrder="20" class="separator-top">
+            <label>PrimeData</label>
+        </tab>
+        <section id="prime_data_connect" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>PrimeData</label>
+            <tab>PrimeData</tab>
+            <resource>PrimeData_PrimeDataConnect::config</resource>
+            <class>separator-top</class>
+            <group id="general" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="start_sync_button_field" translate="label ttf" type="button" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>PrimeData\PrimeDataConnect\Block\Adminhtml\System\Config\StartSyncButton</frontend_model>
+                </field>
+                <label>Status</label>
+                <field id="synchronisation" translate="label" type="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="5">
+                    <label>Historical Data Synchronization</label>
+                    <comment>Disabled</comment>
+                </field>
+                <field id="real_time_sync" translate="label" type="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="5">
+                    <label>Real Time Synchronization</label>
+                    <comment>Disabled</comment>
+                </field>
+            </group>
+            <group id="step1" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Extension Credentials</label>
+                    <field id="validate_msg" translate="label" type="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="5">
+                        <label>Validate Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                    </field>
+                    <field id="validate_value" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="5">
+                        <label>Validate value</label>
+                        <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                    </field>
+                    <field id="user_api_key" translate="label" type="password" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="5">
+                        <label>User API Key</label>
+                        <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="edit_button" translate="label ttf" type="button" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\EditButton</frontend_model>
+                    </field>
+                    <field id="event_api_key" translate="label" type="password" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="6">
+                        <label>Event API Key</label>
+                        <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                        <validate>required-entry</validate>
+                    </field>
+
+                    <field id="validate" translate="label ttf" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\ApiValidationButton</frontend_model>
+                    </field>
+                    <field id="keys_cancel_button" translate="label ttf" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\KeysCancelButton</frontend_model>
+                    </field>
+                </group>
+            <group id="step2" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Synchronization Data and Catalog</label>
+                <comment>How much historical data to be sent to PrimeData based on its creation date.</comment>
+                <field id="start_date" translate="label comment" sortOrder="4" type="text" showInDefault="1" showInStore="1" >
+                    <label>From</label>
+                    <frontend_model>PrimeData\PrimeDataConnect\Block\Adminhtml\System\Config\DatePicker</frontend_model>
+                </field>
+                <field id="allow_customer_group" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Unsubscribe Data</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="custom_dropdown" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Catalog Name</label>
+                    <source_model>PrimeData\PrimeDataConnect\Block\System\Config\CatalogSelect</source_model>
+                </field>
+                <field id="create_list_button" translate="label ttf" type="button" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\CreateListButton</frontend_model>
+                </field>
+                <field id="synced_it_button" translate="label ttf" type="button" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\SyncEditButton</frontend_model>
+                </field>
+                <field id="new_list" translate="none" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="12">
+                    <label>New Catalog</label>
+                    <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                </field>
+                <field id="syn_cancel_button" translate="label ttf" type="button" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>PrimeData\PrimeDataConnect\Block\System\Config\SyncCancelButton</frontend_model>
+                </field>
+                <field id="product_count" translate="label" type="select" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Product</label>
+                    <source_model>PrimeData\PrimeDataConnect\Model\Config\ProductCount</source_model>
+                </field>
+                <field id="customer_count" translate="label" type="select" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Customer</label>
+                    <source_model>PrimeData\PrimeDataConnect\Model\Config\CustomerCount</source_model>
+                </field>
+                <field id="order_count" translate="label" type="select" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Order</label>
+                    <source_model>PrimeData\PrimeDataConnect\Model\Config\OrderCount</source_model>
+                </field>
+                <field id="synchronization_status" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="351">
+                    <label>Synchronization Status</label>
+                    <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                </field>
+                <field id="placeholder_images" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="352">
+                    <label>Placeholder Images</label>
+                    <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

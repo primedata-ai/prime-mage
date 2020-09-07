@@ -1,0 +1,33 @@
+<?php $controller = $block->getCustomUrl();
+    echo $block->getButtonHtml();
+    $image =  $block->getPlaceholderImage();
+    $status = array();
+
+    $data = $block->getSyncActivityStatusFun();
+
+ ?>
+ <script type="text/javascript">
+        require(['jquery', 'jquery/ui'], function($){
+            jQuery(document).ready( function() {
+            	var validate = '<?php echo $data; ?>';
+                var image = '<?php echo $image; ?>'
+                 jQuery('#prime_data_connect_step2_placeholder_images').val(image);
+                if(validate == "In Progress"){
+                    jQuery("#row_prime_data_connect_general_start_sync_button_field").hide();
+                    jQuery("#prime_data_connect_Step1_user_api_key").prop('readonly', true);
+                    jQuery("#prime_data_connect_Step1_event_api_key").prop('readonly', true);
+                    jQuery('#row_prime_data_connect_general_synchronisation p.note span').text(validate);
+                    jQuery('#row_prime_data_connect_general_synchronisation p.note').css('background', 'yellow');
+                    jQuery('#row_prime_data_connect_general_synchronisation p.note').css('color', '#000000');
+                }else if(validate == "Complete"){
+                    jQuery("#row_prime_data_connect_general_start_sync_button_field").hide();
+                	jQuery("#prime_data_connect_Step1_user_api_key").prop('readonly', true);
+                    jQuery("#prime_data_connect_Step1_event_api_key").prop('readonly', true);
+                    jQuery('#row_prime_data_connect_general_synchronisation p.note span').text(validate);
+                    jQuery('#row_prime_data_connect_general_synchronisation p.note').css('background', 'green');
+                }else{
+                    jQuery('#prime_data_connect_step2-state').val(0);
+                }
+            });
+        });
+ </script>
