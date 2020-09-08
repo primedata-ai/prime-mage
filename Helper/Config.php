@@ -7,5 +7,5 @@ use Magento\Framework\App\Helper\AbstractHelper;
 
 class Config extends AbstractHelper
 {
-
+    //TODO need more info about Config
 }
