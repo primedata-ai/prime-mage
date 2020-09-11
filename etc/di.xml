@@ -2,6 +2,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
+    <preference for="PrimeData\PrimeDataConnect\Api\ProducerInterface"
+                type="PrimeData\PrimeDataConnect\Model\Producer"/>
+
     <virtualType name="SubscriptionLogger" type="Monolog\Logger">
         <arguments>
             <argument name="name" xsi:type="string">SubscriptionLogger</argument>
@@ -16,5 +19,13 @@
             <argument name="fileName" xsi:type="string">var/log/primeData/subscription.log</argument>
         </arguments>
     </virtualType>
+
+    <type name="PrimeData\PrimeDataConnect\Helper\RedisConfig">
+        <arguments>
+            <argument name="data" xsi:type="array">
+              <item name="message_queue" xsi:type="string">redis</item>
+            </argument>
+        </arguments>
+    </type>
 
 </config>

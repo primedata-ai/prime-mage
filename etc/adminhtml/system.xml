@@ -6,7 +6,7 @@
         </tab>
         <section id="prime_data_connect" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>PrimeData</label>
-            <tab>PrimeData</tab>
+            <tab>prime_data</tab>
             <resource>PrimeData_PrimeDataConnect::config</resource>
             <class>separator-top</class>
             <group id="transport" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
@@ -14,6 +14,15 @@
                 <field id="default" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Default</label>
                     <source_model>Enqueue\Magento2\Model\Config\Source\Transport</source_model>
+                </field>
+            </group>
+            <group id="client_prime" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Client Prime</label>
+                <field id="source_id" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Source ID</label>
+                </field>
+                <field id="write_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Write Key</label>
                 </field>
             </group>
             <group id="client" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
