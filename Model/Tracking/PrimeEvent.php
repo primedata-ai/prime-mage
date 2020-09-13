@@ -32,8 +32,7 @@ class PrimeEvent
      */
     public function __construct(
         PrimeTarget $primeTarget
-    )
-    {
+    ) {
         $this->primeTarget = $primeTarget;
     }
 
