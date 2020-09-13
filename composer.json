@@ -1,5 +1,5 @@
 {
-  "name": "prime-data/prime-data-connect",
+  "name": "primedata-ai/prime-mage",
   "version": "1.0.0",
   "description": "This module use to Sync Data to Prime Data",
   "type": "magento2-module",
