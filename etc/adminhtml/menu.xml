@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+     <menu>
+        <add id="PrimeData_PrimeDataConnect::config" resource="PrimeData_PrimeDataConnect::config"
+             module="PrimeData_PrimeDataConnect" title="PrimeData" sortOrder="30"
+             action="adminhtml/system_config/edit/section/prime_data_connect"
+             parent="Magento_Config::system_config"/>
+    </menu>
+</config>

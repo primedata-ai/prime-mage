@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Product Tracking -->
+    <event name="catalog_product_save_after">
+        <observer name="prime_data_catalog_product_save_after"
+                  instance="PrimeData\PrimeDataConnect\Observer\Products\ProductSaveAfterObserver" />
+    </event>
+
+    <event name="catalog_product_delete_before">
+        <observer name="prime_data_catalog_product_delete_before"
+                  instance="PrimeData\PrimeDataConnect\Observer\Products\ProductDeleteBeforeObserver" />
+    </event>
+</config>
