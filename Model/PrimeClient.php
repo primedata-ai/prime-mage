@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace PrimeData\PrimeDataConnect\Model;
 
 use Prime\Client as PrimeClientSdk;
-use PrimeData\PrimeDataConnect\Api\ProducerInterface;
+use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBufferInterface;
 
 class PrimeClient
 {
@@ -19,13 +19,9 @@ class PrimeClient
     protected $data = [];
 
     /**
-     * @var ProducerInterface
+     * @var QueueBufferInterface
      */
-
-    /**
-     * @var ProducerInterface
-     */
-    protected $producer;
+    protected $queueBuffer;
 
     /**
      * @var PrimeClientSdk
@@ -35,19 +31,24 @@ class PrimeClient
     /**
      * PrimeClient constructor.
      * @param PrimeConfig $primeConfig
-     * @param ProducerInterface $producer
      * @param array $data
      * @codeCoverageIgnore
      */
     public function __construct(
         PrimeConfig $primeConfig,
-        ProducerInterface $producer,
         array  $data = []
     ) {
         $this->primeConfig = $primeConfig;
         $this->data = $data;
-        $this->producer = $producer;
-        $this->primeClient = new PrimeClientSdk($this->primeConfig->getPrimeConfig(), $this->producer);
+    }
+
+    /**
+     * @param QueueBufferInterface $queueBuffer
+     */
+    public function setQueueBuffer(QueueBufferInterface $queueBuffer)
+    {
+        $this->queueBuffer = $queueBuffer;
+        return $this;
     }
 
     /**
@@ -55,6 +56,10 @@ class PrimeClient
      */
     public function getPrimeClient()
     {
+        if ($this->primeClient) {
+            return  $this->primeClient;
+        }
+        $this->primeClient = new PrimeClientSdk($this->primeConfig->getPrimeConfig(), $this->queueBuffer);
         return $this->primeClient;
     }
 }

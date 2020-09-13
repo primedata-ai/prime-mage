@@ -13,7 +13,7 @@
                 <label>Transport</label>
                 <field id="default" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Default</label>
-                    <source_model>Enqueue\Magento2\Model\Config\Source\Transport</source_model>
+                    <source_model>PrimeData\PrimeDataConnect\Model\Config\Source\Transport</source_model>
                 </field>
             </group>
             <group id="client_prime" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
@@ -25,7 +25,22 @@
                     <label>Write Key</label>
                 </field>
             </group>
-            <group id="client" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="sync_config" translate="label" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Sync Data Config</label>
+                <field id="sync_customer" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sync Customer</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sync_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sync Product</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sync_customer" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sync Customer</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="client" translate="label" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Client</label>
                 <field id="prefix" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Prefix</label>
@@ -209,7 +224,7 @@
                 </field>
                 <field id="vendor" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Vendor</label>
-                    <source_model>Enqueue\Magento2\Model\Config\Source\Redis\Vendor</source_model>
+                    <source_model>PrimeData\PrimeDataConnect\Model\Config\Source\Redis\Vendor</source_model>
                 </field>
                 <field id="persistent" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Persistent</label>

@@ -127,5 +127,7 @@ class PrimeEvent
     {
         $event = $this->createPrimeEventSdk();
         $event::withSessionID($sessionId);
+
+        return $this;
     }
 }

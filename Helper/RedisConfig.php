@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Helper;
 
-use PrimeData\PrimeDataConnect\Helper\Config;
+use Enqueue\Redis\RedisConnectionFactory;
+use Magento\Framework\App\Helper\Context;
 
 class RedisConfig extends Config
 {
@@ -12,8 +13,9 @@ class RedisConfig extends Config
     const REDIS_DATABASE = 'prime_data_connect/redis/database';
     const REDIS_PASSWORD = 'prime_data_connect/redis/password';
     const REDIS_RETRY_AFTER = 'prime_data_connect/redis/retry_after';
-
     protected $redisParams = [];
+
+    protected $redisConnect = '';
 
     /**
      * @return string
@@ -58,7 +60,7 @@ class RedisConfig extends Config
     /**
      * @return array
      */
-    public function getRedisConfig()
+    public function getMessageQueueConfig()
     {
         if ($this->redisParams) {
             return $this->redisParams;
@@ -79,4 +81,16 @@ class RedisConfig extends Config
         return  $this->redisParams;
     }
 
+    /**
+     * @return RedisConnectionFactory|string
+     */
+    public function getConnection()
+    {
+        if ($this->redisConnect) {
+            return $this->redisConnect;
+        }
+        $this->redisConnect = new RedisConnectionFactory($this->getMessageQueueConfig());
+
+        return $this->redisConnect;
+    }
 }

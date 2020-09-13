@@ -13,11 +13,16 @@ class Config extends AbstractHelper
 
     protected $data;
 
+    /**
+     * Config constructor.
+     * @param Context $context
+     * @param array $data
+     * @codeCoverageIgnore
+     */
     public function __construct(
         Context $context,
         array $data = []
-    )
-    {
+    ) {
         $this->data = $data;
         parent::__construct($context);
     }
@@ -76,5 +81,4 @@ class Config extends AbstractHelper
         $path = 'prime_data_connect/' . $this->data['message_queue'] . '/lazy';
         return $this->scopeConfig->isSetFlag($path);
     }
-
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Customer Tracking -->
+    <event name="customer_register_success">
+        <observer name="prime_data_customer_register_success"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\CustomerRegisterObserver" />
+    </event>
+
+    <event name="customer_account_edited">
+        <observer name="prime_data_customer_account_edited"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\CustomerUpdateObserver" />
+    </event>
+</config>

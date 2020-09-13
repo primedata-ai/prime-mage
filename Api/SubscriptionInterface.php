@@ -9,8 +9,8 @@ interface SubscriptionInterface
      *
      * @param int $customerId
      * @param string $email
-     * @param $isSubscribed
-     * @param $subscribeAt
+     * @param string $isSubscribed
+     * @param string $subscribeAt
      * @return $this
      * @api
      */
