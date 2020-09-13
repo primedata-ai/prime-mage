@@ -70,11 +70,11 @@ class QueueBuffer implements QueueBufferInterface
         try {
             $this->producer->send($topic, $message);
         } catch (Exception\InvalidDestinationException $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         } catch (Exception\InvalidMessageException $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         } catch (Exception $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         }
     }
 }

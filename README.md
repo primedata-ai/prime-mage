@@ -3,18 +3,16 @@ This module used to sync data from Magento Site to PrimeAi
 
 ## Dependency
 This module dependency some library :
-    `
-    1. primedata-ai/analytics-php:v0.3.*
-    2. enqueue/redis:0.9.2
-    3. predis/predis:^1.1
-    4. ext-json
+* primedata-ai/analytics-php:v0.3.*
+* enqueue/redis:0.9.2
+* predis/predis:^1.1
+* ext-json
     5. enqueue/enqueue:0.9.2
-    `
 ## UseCase:
 Go to Store -> PrimeData 
-    1. Config Transport: 'Redis' 
-    2. Config Prime Client
-    3. Setup information for 'Redis'.
+* Config Transport: 'Redis' 
+* Config Prime Client
+* Setup information for 'Redis'.
 ## To test function
 ###  example for procedure
 ```php
@@ -81,7 +79,7 @@ $run = true;
 while ($run == true) {
     $message = $consumer->receive();
     if (!$message) {
-        print_r('chua co du lieu');
+        print_r('Unknown error');
     } else {
         print_r($message);
         $consumer->acknowledge($message);
