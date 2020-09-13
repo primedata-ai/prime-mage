@@ -4,6 +4,7 @@
   "description": "This module use to Sync Data to Prime Data",
   "type": "magento2-module",
   "require": {
+      "php": "^7.0",
       "primedata-ai/analytics-php": "v0.3.*",
       "enqueue/redis": "^0.9.12",
       "predis/predis": "^1.1",
