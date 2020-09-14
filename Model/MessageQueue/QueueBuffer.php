@@ -60,7 +60,7 @@ class QueueBuffer implements QueueBufferInterface
     /**
      * @inheritDoc
      */
-    public function sendMessage(string $topic, object $msg)
+    public function sendMessage(string $topic, \JsonSerializable $msg)
     {
         $queueName = 'enqueue.app.default';
         $this->queueContext->createQueue($queueName);
