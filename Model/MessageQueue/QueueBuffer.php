@@ -60,7 +60,7 @@ class QueueBuffer implements QueueBufferInterface
     /**
      * @inheritDoc
      */
-    public function sendMessage(string $topic, object $msg)
+    public function sendMessage(string $topic, \JsonSerializable $msg)
     {
         $queueName = 'enqueue.app.default';
         $this->queueContext->createQueue($queueName);
@@ -70,11 +70,11 @@ class QueueBuffer implements QueueBufferInterface
         try {
             $this->producer->send($topic, $message);
         } catch (Exception\InvalidDestinationException $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         } catch (Exception\InvalidMessageException $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         } catch (Exception $e) {
-            print_r($e->getMessage());
+            $this->logger->error($e->getMessage());
         }
     }
 }
