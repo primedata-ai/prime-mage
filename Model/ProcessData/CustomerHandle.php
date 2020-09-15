@@ -68,6 +68,7 @@ class CustomerHandle
         $customerData['joined_at'] = $joinedAt;
         $customerData['websiteId'] = $this->getWebsiteId();
         $customerData['store_url'] = $this->getStoreUrl();
+        $customerData['session_id'] = $this->getCustomerSessionId((int)$customerID);
 
         return $customerData;
     }
@@ -140,7 +141,7 @@ class CustomerHandle
      */
     public function getCustomerSessionId(int $customerId)
     {
-        $customerIdSession = $this->customerSession->getSessionId();
+        $customerIdSession = $this->customerSession->getCustomerId();
         if (!$customerIdSession) {
             return null;
         }

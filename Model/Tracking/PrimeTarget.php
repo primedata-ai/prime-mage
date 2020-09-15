@@ -11,10 +11,12 @@ class PrimeTarget
      * @var string
      */
     private $itemType;
+
     /**
-     * @var void
+     * @var string
      */
-    private $itemId;
+    protected $itemId;
+
     /**
      * @var array
      */
@@ -22,10 +24,12 @@ class PrimeTarget
 
     /**
      * @param string $itemType
+     * @return $this
      */
     public function setItemType(string $itemType)
     {
         $this->itemType = $itemType;
+        return $this;
     }
 
     /**
@@ -33,17 +37,17 @@ class PrimeTarget
      */
     public function getItemType()
     {
-        $result = $this->itemType;
-        $this->itemType = $this->setItemType('default');
-        return $result;
+        return $this->itemType;
     }
 
     /**
      * @param string $itemId
+     * @return $this
      */
     public function setItemId(string $itemId)
     {
         $this->itemId = $itemId;
+        return $this;
     }
 
     /**
@@ -51,17 +55,17 @@ class PrimeTarget
      */
     public function getItemId()
     {
-        $result = $this->itemtId;
-        $this->itemId = $this->setItemId('default');
-        return $result;
+        return $this->itemtId;
     }
 
     /**
      * @param array $properties
+     * @return $this
      */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
+        return $this;
     }
 
     /**
@@ -69,9 +73,7 @@ class PrimeTarget
      */
     public function getProperties()
     {
-        $result = $this->properties;
-        $this->properties = $this->setProperties(['default']);
-        return $result;
+        return $this->properties;
     }
 
     /**

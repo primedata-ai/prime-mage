@@ -17,6 +17,7 @@ class SyncHandle
     const MESSAGE_QUEUE_DEFAULT = 'redis';
     const DEFAULT_SESSION_ID = '1e85YTciGhH6vLfLpmqhJfhFhpq';
     const SESSION_ID = 'session_id';
+    const GUEST_CUSTOMER_ID = 0;
 
     /**
      * @var ObjectManagerFactory
@@ -145,6 +146,29 @@ class SyncHandle
 
         $this->primeEvent = $this->getEventData($properties);
         $primeClient->track($eventName, $data, $this->primeClient);
+    }
+
+    /**
+     * @param int $customerId
+     * @param array $data
+     * @throws \ErrorException
+     */
+    public function syncIdentifyToPrime(int $customerId, array $data)
+    {
+        $this->queueConnect = $this->getMessageQueueConnect();
+        if (!$customerId) {
+            throw new \ErrorException('Missing Customer Id');
+        }
+
+        if (!$data) {
+            throw new \ErrorException('Missing data to sync');
+        }
+
+        $connect = $this->queueConnect->getConnection();
+        $queueBuffer = $this->queueBuffer->createQueueManage($connect);
+        $primeClient = $this->primeClient->setQueueBuffer($queueBuffer)->getPrimeClient();
+
+        $primeClient->identify($customerId, $data);
     }
 
     /**

@@ -38,10 +38,12 @@ class PrimeEvent
 
     /**
      * @param string $scope
+     * @return string
      */
     public function setScope(string $scope)
     {
         $this->scope = $scope;
+        return $this;
     }
 
     /**
@@ -49,10 +51,7 @@ class PrimeEvent
      */
     public function getScope()
     {
-        $result = $this->scope;
-        $this->scope = 'default';
-
-        return $result;
+        return $this->scope;
     }
 
     /**
@@ -68,18 +67,17 @@ class PrimeEvent
      */
     public function getEventName()
     {
-        $result = $this->eventName;
-        $this->eventName = 'default';
-
-        return $result;
+        return  $this->eventName;
     }
 
     /**
      * @param array $properties
+     * @return $this
      */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
+        return $this;
     }
 
     /**
@@ -87,9 +85,7 @@ class PrimeEvent
      */
     public function getProperties() :array
     {
-        $result = $this->properties;
-        $this->properties = [];
-        return $result;
+        return  $this->properties;
     }
 
     /**
@@ -121,6 +117,7 @@ class PrimeEvent
 
     /**
      * @param string $sessionId
+     * @return $this
      */
     public function setSessionId(string $sessionId)
     {
