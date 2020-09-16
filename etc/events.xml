@@ -10,4 +10,9 @@
         <observer name="prime_data_customer_account_edited"
                   instance="PrimeData\PrimeDataConnect\Observer\Customer\CustomerUpdateObserver" />
     </event>
+
+    <event name="customer_address_save_after">
+        <observer name="prime_data_after_address_save"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\AfterAddressSaveObserver" />
+    </event>
 </config>
