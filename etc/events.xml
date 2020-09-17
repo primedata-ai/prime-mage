@@ -15,4 +15,10 @@
         <observer name="prime_data_after_address_save"
                   instance="PrimeData\PrimeDataConnect\Observer\Customer\AfterAddressSaveObserver" />
     </event>
+
+    <!--- WishList Product -->
+    <event name="wishlist_add_product">
+        <observer name="prime_data_customer_add_wishlist"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\AddWishlistObserver" />
+    </event>
 </config>

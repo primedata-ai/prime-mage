@@ -40,8 +40,7 @@ class ProductHandle
         $urlKey = preg_replace('~-+~', '-', $urlKey);
         $urlKey = strtolower($urlKey);
 
-        $productUrl = $store->getBaseUrl() . $urlKey . '.html';
-        return $productUrl;
+        return $store->getBaseUrl() . $urlKey . '.html';
     }
 
     /**
@@ -66,9 +65,28 @@ class ProductHandle
             'product_type' => $productType,
             'productUrl'   => $productUrl,
             'product_image' => $productImage,
-            'product_price' => $product->getPrice(),
+            'product_price' => $this->getPriceDataProduct($product),
             'product_id'   => $productId,
             'category_ids' => $cats
+        ];
+    }
+
+    /**
+     * @param Product $product
+     * @return array
+     * @throws NoSuchEntityException
+     */
+    public function getPriceDataProduct(Product $product)
+    {
+        $priceData = $product->getPriceModel();
+        $priceFinal = $priceData->getFinalPrice(1, $product);
+        $priceOrigin = $product->getPrice();
+        $currency = $this->storeManager->getStore()->getBaseCurrencyCode();
+
+        return [
+            'price_origin' => $priceOrigin,
+            'price_discount' => ($priceFinal < $priceOrigin) ? $priceFinal : null,
+            'currency'      => $currency
         ];
     }
 }
