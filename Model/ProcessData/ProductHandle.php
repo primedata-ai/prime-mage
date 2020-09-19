@@ -3,25 +3,39 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Model\ProcessData;
 
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
+use Prime\Tracking\Target;
+use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
 
 class ProductHandle
 {
+    const TYPE_TARGET = 'product';
+    const SESSION_DEFAULT = 'admin-session-id';
+
     /**
      * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
+     * @var Target
+     */
+    protected $target;
+
+    /**
      * ProductHandle constructor.
      * @param StoreManagerInterface $storeManager
+     * @param PrimeTarget $target
      */
     public function __construct(
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        PrimeTarget $target
     ) {
         $this->storeManager = $storeManager;
+        $this->target = $target;
     }
 
     /**
@@ -44,11 +58,24 @@ class ProductHandle
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
+     * @return Target
+     * @throws NoSuchEntityException
+     */
+    public function processProductSync(ProductInterface $product)
+    {
+        $this->target->setItemType(self::TYPE_TARGET);
+        $this->target->setItemId((string)$product->getId());
+        $this->target->setProperties($this->getProperties($product));
+        return  $this->target->createPrimeTarget();
+    }
+
+    /**
+     * @param ProductInterface $product
      * @return array
      * @throws NoSuchEntityException
      */
-    public function processProductSync(Product $product) :array
+    public function getProperties(ProductInterface $product)
     {
         $cats = $product->getCategoryIds();
         $productId = $product->getId();
@@ -58,7 +85,8 @@ class ProductHandle
         $productType = $product->getTypeId();
         $productUrl = $this->getProductUrl($productSku);
         $productImage = $product->getImage();
-        return  [
+
+        return [
             'product_name' => $productName,
             'product_sku'  => $productSku,
             'created_at'   => $productCreatedAt,
@@ -72,11 +100,11 @@ class ProductHandle
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @return array
      * @throws NoSuchEntityException
      */
-    public function getPriceDataProduct(Product $product)
+    public function getPriceDataProduct(ProductInterface $product)
     {
         $priceData = $product->getPriceModel();
         $priceFinal = $priceData->getFinalPrice(1, $product);
@@ -88,5 +116,13 @@ class ProductHandle
             'price_discount' => ($priceFinal < $priceOrigin) ? $priceFinal : null,
             'currency'      => $currency
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return self::SESSION_DEFAULT;
     }
 }

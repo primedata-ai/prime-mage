@@ -10,11 +10,11 @@ class PrimeEvent
     /**
      * @var string
      */
-    private $eventName = 'default';
+    private $eventName;
     /**
      * @var string
      */
-    private $scope = 'default';
+    private $scope;
     /**
      * @var array
      */

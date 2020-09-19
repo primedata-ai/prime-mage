@@ -6,8 +6,4 @@
                   instance="PrimeData\PrimeDataConnect\Observer\Products\ProductSaveAfterObserver" />
     </event>
 
-    <event name="catalog_product_delete_before">
-        <observer name="prime_data_catalog_product_delete_before"
-                  instance="PrimeData\PrimeDataConnect\Observer\Products\ProductDeleteBeforeObserver" />
-    </event>
 </config>

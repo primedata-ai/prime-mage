@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace PrimeData\PrimeDataConnect\Observer\Customer;
 
 use Magento\Customer\Model\Address;
-use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use PrimeData\PrimeDataConnect\Helper\MessageQueue\SyncHandle;

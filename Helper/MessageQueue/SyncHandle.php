@@ -4,20 +4,26 @@ declare(strict_types=1);
 namespace PrimeData\PrimeDataConnect\Helper\MessageQueue;
 
 use Magento\Framework\App\ObjectManagerFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Prime\Tracking\Event;
+use Prime\Tracking\Source;
+use Prime\Tracking\Target;
 use PrimeData\PrimeDataConnect\Helper\RedisConfig;
 use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
 use PrimeData\PrimeDataConnect\Model\PrimeConfig;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeEvent;
+use PrimeData\PrimeDataConnect\Model\Tracking\PrimeSource;
+use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
 use Psr\Log\LoggerInterface;
 
 class SyncHandle
 {
     const MESSAGE_QUEUE_DEFAULT = 'redis';
-    const DEFAULT_SESSION_ID = '1e85YTciGhH6vLfLpmqhJfhFhpq';
-    const SESSION_ID = 'session_id';
-    const GUEST_CUSTOMER_ID = 0;
+    const SCOPE_DEFAULT = 'website';
+    const SOURCE_DEFINE = 'site';
 
     /**
      * @var ObjectManagerFactory
@@ -54,35 +60,52 @@ class SyncHandle
      */
     protected $messageQueueCode;
 
+    /**
+     * @var mixed
+     */
     private $queueConnect;
+    /**
+     * @var PrimeSource
+     */
+    protected $primeSource;
+    /**
+     * @var PrimeTarget
+     */
+    protected $primeTarget;
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
 
     /**
      * SyncHandle constructor.
      * @param ObjectManagerFactory $objectManagerFactory
      * @param PrimeClient $primeClient
      * @param PrimeEvent $primeEvent
+     * @param PrimeSource $primeSource
      * @param PrimeConfig $primeConfig
      * @param QueueBuffer $queueBuffer
+     * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
-     * @param array $data
-     * @codeCoverageIgnore
      */
     public function __construct(
         ObjectManagerFactory $objectManagerFactory,
         PrimeClient $primeClient,
         PrimeEvent $primeEvent,
+        PrimeSource $primeSource,
         PrimeConfig $primeConfig,
         QueueBuffer $queueBuffer,
-        LoggerInterface $logger,
-        array $data = []
+        StoreManagerInterface $storeManager,
+        LoggerInterface $logger
     ) {
         $this->objectManagerFactory = $objectManagerFactory;
         $this->primeClient = $primeClient;
         $this->primeEvent = $primeEvent;
+        $this->primeSource = $primeSource;
         $this->primeConfig = $primeConfig;
         $this->queueBuffer  = $queueBuffer;
+        $this->storeManager = $storeManager;
         $this->logger = $logger;
-        $this->data = $data;
         $this->queueConnect = $this->getMessageQueueConnect();
     }
 
@@ -124,28 +147,34 @@ class SyncHandle
 
     /**
      * @param string $eventName
-     * @param array $data
-     * @param array $properties
+     * @param string $sessionId
+     * @param Target $target
      * @throws \ErrorException
-     * @throws \Exception
+     * @throws NoSuchEntityException
      */
-    public function synDataToPrime(string $eventName, array $data, array $properties = [])
+    public function synDataToPrime(string $eventName, string $sessionId, Target $target)
     {
         $this->queueConnect = $this->getMessageQueueConnect();
         if (!$eventName) {
             throw new \ErrorException('Missing Event Name');
         }
 
-        if (!$data) {
-            throw new \ErrorException('Missing data to sync');
+        if (!$sessionId) {
+            throw new \ErrorException('Missing Session Id event to sync');
         }
 
         $connect = $this->queueConnect->getConnection();
         $queueBuffer = $this->queueBuffer->createQueueManage($connect);
         $primeClient = $this->primeClient->setQueueBuffer($queueBuffer)->getPrimeClient();
+        $source = $this->createPrimeSource();
 
-        $this->primeEvent = $this->getEventData($properties);
-        $primeClient->track($eventName, $data, $this->primeClient);
+        $primeClient->track(
+            $eventName,
+            [],
+            Event::withSessionID($sessionId),
+            Event::withSource($source),
+            Event::withTarget($target)
+        );
     }
 
     /**
@@ -172,19 +201,15 @@ class SyncHandle
     }
 
     /**
-     * @param array $properties
-     * @return array|PrimeEvent
+     * @return Source
+     * @throws NoSuchEntityException
      */
-    public function getEventData(array $properties)
+    protected function createPrimeSource()
     {
-        if (!$properties) {
-            $this->primeEvent->setSessionId(self::DEFAULT_SESSION_ID);
-        }
+        $this->primeSource->setItemType(self::SOURCE_DEFINE);
+        $storeUrl = $this->storeManager->getStore()->getBaseUrl();
+        $this->primeSource->setItemId($storeUrl);
 
-        if (isset($properties[self::SESSION_ID])) {
-            $this->primeEvent->setSessionId($properties[self::SESSION_ID]);
-        }
-
-        return  $this->primeEvent;
+        return $this->primeSource->createPrimeSource();
     }
 }

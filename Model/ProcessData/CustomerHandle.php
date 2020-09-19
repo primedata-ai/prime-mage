@@ -150,7 +150,7 @@ class CustomerHandle
             return $this->customerSession->getSessionId();
         }
 
-        return null;
+        return $customerIdSession;
     }
 
     /**

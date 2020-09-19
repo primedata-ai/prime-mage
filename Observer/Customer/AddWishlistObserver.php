@@ -60,9 +60,10 @@ class AddWishlistObserver implements ObserverInterface
             $wishlist = $observer->getEvent()->getWishlist();
             $item = $observer->getEvent()->getItem();
             try {
-                $wishlistData = $this->wishlistHandle->processWishlistData($wishlist, $item);
+                $wishlistTarget = $this->wishlistHandle->processWishlistData($wishlist, $item);
+                $sessionId = $this->wishlistHandle->getSessionId($wishlist);
                 $this->syncHandle->setMessageQueueCode('redis');
-                $this->syncHandle->synDataToPrime(self::EVENT_WISHLIST, $wishlistData);
+                $this->syncHandle->synDataToPrime(self::EVENT_WISHLIST, $sessionId, $wishlistTarget);
             } catch (\Exception $exception) {
                 $this->logger->error(self::EVENT_WISHLIST, [
                     'message' => $exception->getMessage(),
