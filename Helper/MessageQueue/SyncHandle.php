@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Helper\MessageQueue;
 
-use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,11 +24,6 @@ class SyncHandle
     const MESSAGE_QUEUE_DEFAULT = 'redis';
     const SCOPE_DEFAULT = 'website';
     const SOURCE_DEFINE = 'site';
-
-    /**
-     * @var ObjectManagerFactory
-     */
-    protected $objectManagerFactory;
 
     /**
      * @var ObjectManagerInterface
@@ -72,7 +66,7 @@ class SyncHandle
 
     /**
      * SyncHandle constructor.
-     * @param ObjectManagerFactory $objectManagerFactory
+     * @param ObjectManagerInterface $objectManager
      * @param PrimeClient $primeClient
      * @param PrimeConfig $primeConfig
      * @param QueueBuffer $queueBuffer
@@ -80,7 +74,7 @@ class SyncHandle
      * @param LoggerInterface $logger
      */
     public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
+        ObjectManagerInterface $objectManager,
         PrimeClient $primeClient,
         PrimeConfig $primeConfig,
         QueueBuffer $queueBuffer,
@@ -90,7 +84,7 @@ class SyncHandle
         LoggerInterface $logger
     )
     {
-        $this->objectManagerFactory = $objectManagerFactory;
+        $this->objectManager = $objectManager;
         $this->primeClient = $primeClient;
         $this->deviceHandler = $deviceHandle;
         $this->primeConfig = $primeConfig;
@@ -105,19 +99,6 @@ class SyncHandle
     }
 
     /**
-     * Gets initialized object manager
-     *
-     * @return ObjectManagerInterface
-     */
-    protected function getObjectManager()
-    {
-        if (null == $this->objectManager) {
-            $this->objectManager = $this->objectManagerFactory->create($_SERVER);
-        }
-        return $this->objectManager;
-    }
-
-    /**
      * @param string $transport
      * @return MessageConfigInterface
      */
@@ -125,10 +106,10 @@ class SyncHandle
     {
         switch ($transport) {
             case self::MESSAGE_QUEUE_DEFAULT:
-                $this->queueConnect = $this->getObjectManager()->create(RedisConfig::class);
+                $this->queueConnect = $this->objectManager->create(RedisConfig::class);
                 break;
             default:
-                $this->queueConnect = $this->getObjectManager()->create(RedisConfig::class);
+                $this->queueConnect = $this->objectManager->create(RedisConfig::class);
         }
 
         return $this->queueConnect;

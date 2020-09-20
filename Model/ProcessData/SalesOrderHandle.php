@@ -82,6 +82,8 @@ class SalesOrderHandle
             'subtotal'        => $order->getBaseSubtotal(),
             'grand_total'     => $order->getGrandTotal(),
             'discount_amount' => $order->getDiscountAmount(),
+            'shipping_amount' => $order->getShippingAmount(),
+            'payment_method'  => $order->getPayment()->getMethod(),
         ];
     }
 
