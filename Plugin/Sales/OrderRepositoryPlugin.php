@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Plugin\Sales;
 
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use PrimeData\PrimeDataConnect\Helper\MessageQueue\SyncHandle;
@@ -76,15 +75,10 @@ class OrderRepositoryPlugin
             $sessionId = $this->saleOrderHandle->getSessionId();
             $orderProperty = $this->saleOrderHandle->processOrderData($order);
             $this->syncHandle->synDataToPrime(self::EVENT_SYNC, $sessionId, $orderProperty);
-        } catch (\ErrorException $e) {
+        } catch (\Exception $e) {
             $this->logger->error(self::EVENT_SYNC, [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
-            ]);
-        } catch (NoSuchEntityException $ne) {
-            $this->logger->error(self::EVENT_SYNC, [
-                'message' => $ne->getMessage(),
-                'trace' => $ne->getTraceAsString()
             ]);
         }
     }

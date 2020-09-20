@@ -124,10 +124,11 @@ class SyncHandle
      * @param string $eventName
      * @param string $sessionId
      * @param Target $target
-     * @throws \ErrorException
+     * @param array $data
      * @throws NoSuchEntityException
+     * @throws \ErrorException
      */
-    public function synDataToPrime(string $eventName, string $sessionId, Target $target)
+    public function synDataToPrime(string $eventName, string $sessionId, Target $target, array $data = [])
     {
         if (!$eventName) {
             throw new \ErrorException('Missing Event Name');
@@ -141,7 +142,7 @@ class SyncHandle
         $source = $this->createPrimeSource();
         $primeClient->track(
             $eventName,
-            [],
+            $data,
             Event::withSessionID($sessionId),
             Event::withSource($source),
             Event::withTarget($target)
