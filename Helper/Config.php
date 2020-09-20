@@ -10,6 +10,7 @@ class Config extends AbstractHelper
 {
     const PRIME_CLIENT_SOURCE_ID = 'prime_data_connect/client_prime/source_id';
     const PRIME_CLIENT_WRITE_KEY = 'prime_data_connect/client_prime/write_key';
+    const PRIME_TRANSPORT_CONFIG = 'prime_data_connect/transport/config';
 
     protected $data;
 
@@ -41,6 +42,14 @@ class Config extends AbstractHelper
     public function getPrimeClientWriteKey(): string
     {
         return (string)$this->scopeConfig->getValue(self::PRIME_CLIENT_WRITE_KEY);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransport()
+    {
+        return (string)$this->scopeConfig->getValue(self::PRIME_TRANSPORT_CONFIG);
     }
 
     /**

@@ -99,31 +99,4 @@ class PrimeEvent
         $this->eventSdk = new PrimeEventSdk($this->getEventName(), $this->getScope(), $this->getProperties());
         return $this->eventSdk;
     }
-
-    /**
-     * @param string $itemId
-     * @param string $itemType
-     * @param array $data
-     */
-    public function setTargetEvent(string $itemId, string $itemType, array $data)
-    {
-        $event = $this->createPrimeEventSdk();
-        $this->primeTarget->setItemId($itemId);
-        $this->primeTarget->setItemType($itemType);
-        $this->primeTarget->setProperties($data);
-        $primeTarget = $this->primeTarget->createPrimeTarget();
-        $event::withTarget($primeTarget);
-    }
-
-    /**
-     * @param string $sessionId
-     * @return $this
-     */
-    public function setSessionId(string $sessionId)
-    {
-        $event = $this->createPrimeEventSdk();
-        $event::withSessionID($sessionId);
-
-        return $this;
-    }
 }

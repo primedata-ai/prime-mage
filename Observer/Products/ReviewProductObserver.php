@@ -60,7 +60,6 @@ class ReviewProductObserver implements ObserverInterface
             try {
                 $reviewTarget = $this->reviewHandle->processReviewData($review);
                 $sessionId = $this->reviewHandle->getSessionId($review);
-                $this->syncHandle->setMessageQueueCode('redis');
                 $this->syncHandle->synDataToPrime(self::EVENT_SYNC_REVIEW, $sessionId, $reviewTarget);
             } catch (\Exception $e) {
                 $this->logger->error(

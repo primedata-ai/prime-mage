@@ -69,7 +69,6 @@ class AfterAddressSaveObserver implements ObserverInterface
                     $customerAddress = $this->customerHandle->processCustomerSync($customer);
                     $customerData = $this->customerHandle->getCustomerAddress($customer);
                     $customerInfo = array_merge($customerAddress, $customerData);
-                    $this->syncHandle->setMessageQueueCode('redis');
                     $this->syncHandle->syncIdentifyToPrime((int)$address->getCustomerId(), $customerInfo);
                 } catch (\Exception $exception) {
                     $this->logger->error(

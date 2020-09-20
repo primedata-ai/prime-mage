@@ -76,7 +76,6 @@ class CustomerRegisterObserver implements ObserverInterface
                 $customerId = $customer->getId();
                 $customerDevice = $this->deviceHandle->getDeviceInfo();
                 $customerProperty = array_merge($customerDevice, $this->customerHandle->processCustomerSync($customer));
-                $this->syncHandle->setMessageQueueCode('redis');
                 $this->syncHandle->syncIdentifyToPrime((int)$customerId, $customerProperty);
             } catch (\Exception $exception) {
                 $this->logger->error(

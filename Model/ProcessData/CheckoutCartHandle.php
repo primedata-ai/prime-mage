@@ -94,6 +94,7 @@ class CheckoutCartHandle
             'price'       => $cartItem->getPrice(),
             'discount_amount' => $cartItem->getDiscountAmount(),
             'total_value'     => $cartItem->getRowTotal(),
+            'discount_value'  => $cartItem->getRowTotal() - (float)$cartItem->getDiscountAmount(),
             'currency'      => $this->storeManager->getStore()->getBaseCurrencyCode()
         ];
     }

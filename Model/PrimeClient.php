@@ -44,6 +44,7 @@ class PrimeClient
 
     /**
      * @param QueueBufferInterface $queueBuffer
+     * @return $this
      */
     public function setQueueBuffer(QueueBufferInterface $queueBuffer)
     {

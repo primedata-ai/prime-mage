@@ -75,7 +75,6 @@ class CustomerUpdateObserver implements ObserverInterface
                 $customerAddress = $this->customerHandle->getCustomerAddress($customer);
                 $customerDevice = $this->deviceHandle->getDeviceInfo();
                 $customerData = array_merge($customerData, $customerAddress, $customerDevice);
-                $this->syncHandle->setMessageQueueCode('redis');
                 $this->syncHandle->syncIdentifyToPrime((int)$customer->getId(), $customerData);
             } catch (Exception $exception) {
                 $this->logger->error(

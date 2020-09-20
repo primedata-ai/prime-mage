@@ -74,7 +74,6 @@ class OrderRepositoryPlugin
         try {
             $sessionId = $this->saleOrderHandle->getSessionId();
             $orderProperty = $this->saleOrderHandle->processOrderData($order);
-            $this->syncHandle->setMessageQueueCode('redis');
             $this->syncHandle->synDataToPrime(self::EVENT_SYNC, $sessionId, $orderProperty);
         } catch (\Exception $e) {
             $this->logger->error(self::EVENT_SYNC, [

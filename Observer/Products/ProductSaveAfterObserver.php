@@ -64,7 +64,6 @@ class ProductSaveAfterObserver implements ObserverInterface
             try {
                 $productTarget = $this->productHandle->processProductSync($product);
                 $sessionId = $this->productHandle->getSessionId();
-                $this->syncHandle->setMessageQueueCode('redis');
                 $this->syncHandle->synDataToPrime(self::EVENT_UPDATE_CREATE_PRODUCT, $sessionId, $productTarget);
             } catch (\Exception $exception) {
                 $this->logger->error(self::EVENT_UPDATE_CREATE_PRODUCT, [

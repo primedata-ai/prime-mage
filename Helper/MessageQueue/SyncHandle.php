@@ -10,13 +10,13 @@ use Magento\Store\Model\StoreManagerInterface;
 use Prime\Tracking\Event;
 use Prime\Tracking\Source;
 use Prime\Tracking\Target;
+use PrimeData\PrimeDataConnect\Helper\Config as PrimeHelperConfig;
 use PrimeData\PrimeDataConnect\Helper\RedisConfig;
 use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
 use PrimeData\PrimeDataConnect\Model\PrimeConfig;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeEvent;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeSource;
-use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
 use Psr\Log\LoggerInterface;
 
 class SyncHandle
@@ -68,14 +68,13 @@ class SyncHandle
      * @var PrimeSource
      */
     protected $primeSource;
-    /**
-     * @var PrimeTarget
-     */
-    protected $primeTarget;
+
     /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
+
+    protected $queueManage;
 
     /**
      * SyncHandle constructor.
@@ -96,6 +95,7 @@ class SyncHandle
         PrimeConfig $primeConfig,
         QueueBuffer $queueBuffer,
         StoreManagerInterface $storeManager,
+        PrimeHelperConfig $helperConfig,
         LoggerInterface $logger
     ) {
         $this->objectManagerFactory = $objectManagerFactory;
@@ -106,7 +106,11 @@ class SyncHandle
         $this->queueBuffer  = $queueBuffer;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
-        $this->queueConnect = $this->getMessageQueueConnect();
+
+        $messageConfig = $helperConfig->getTransport();
+        $this->queueConnect = $this->getMessageQueueConnect($messageConfig);
+        $connect = $this->queueConnect->getConnection();
+        $this->queueManage = $this->queueBuffer->createQueueManage($connect);
     }
 
     /**
@@ -123,26 +127,20 @@ class SyncHandle
     }
 
     /**
-     * @return mixed
+     * @param string $transport
+     * @return MessageConfigInterface
      */
-    protected function getMessageQueueConnect()
+    protected function getMessageQueueConnect(string $transport)
     {
-        switch ($this->messageQueueCode) {
+        switch ($transport) {
             case self::MESSAGE_QUEUE_DEFAULT:
+                $this->queueConnect = $this->getObjectManager()->create(RedisConfig::class);
+                break;
+            default:
                 $this->queueConnect = $this->getObjectManager()->create(RedisConfig::class);
         }
 
         return $this->queueConnect;
-    }
-
-    /**
-     * @param string $messageQueueCode
-     * @return $this
-     */
-    public function setMessageQueueCode(string $messageQueueCode)
-    {
-        $this->messageQueueCode = $messageQueueCode;
-        return $this;
     }
 
     /**
@@ -154,7 +152,6 @@ class SyncHandle
      */
     public function synDataToPrime(string $eventName, string $sessionId, Target $target)
     {
-        $this->queueConnect = $this->getMessageQueueConnect();
         if (!$eventName) {
             throw new \ErrorException('Missing Event Name');
         }
@@ -163,11 +160,8 @@ class SyncHandle
             throw new \ErrorException('Missing Session Id event to sync');
         }
 
-        $connect = $this->queueConnect->getConnection();
-        $queueBuffer = $this->queueBuffer->createQueueManage($connect);
-        $primeClient = $this->primeClient->setQueueBuffer($queueBuffer)->getPrimeClient();
+        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
         $source = $this->createPrimeSource();
-
         $primeClient->track(
             $eventName,
             [],
@@ -184,7 +178,6 @@ class SyncHandle
      */
     public function syncIdentifyToPrime(int $customerId, array $data)
     {
-        $this->queueConnect = $this->getMessageQueueConnect();
         if (!$customerId) {
             throw new \ErrorException('Missing Customer Id');
         }
@@ -193,10 +186,7 @@ class SyncHandle
             throw new \ErrorException('Missing data to sync');
         }
 
-        $connect = $this->queueConnect->getConnection();
-        $queueBuffer = $this->queueBuffer->createQueueManage($connect);
-        $primeClient = $this->primeClient->setQueueBuffer($queueBuffer)->getPrimeClient();
-
+        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
         $primeClient->identify($customerId, $data);
     }
 

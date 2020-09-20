@@ -60,7 +60,6 @@ class AddProductObserver implements ObserverInterface
                 $cartItem = $observer->getEvent()->getQuoteItem();
                 $sessionId = $this->checkoutCartHandle->getSessionId();
                 $properties = $this->checkoutCartHandle->processCartItemData($cartItem);
-                $this->syncHandle->setMessageQueueCode('redis');
                 $this->syncHandle->synDataToPrime(self::SYNC_EVENT, $sessionId, $properties);
             } catch (\Exception $e) {
                 $this->logger->error(self::SYNC_EVENT, [
