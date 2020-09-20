@@ -16,18 +16,12 @@ class CheckoutCartHandle
     const TYPE_TARGET = 'add_item_to_cart';
 
     protected $cartItemRepository;
-    /**
-     * @var DeviceHandle
-     */
-    protected $deviceHandle;
+
     /**
      * @var Session
      */
     private $checkoutSession;
-    /**
-     * @var PrimeTarget
-     */
-    protected $target;
+
     /**
      * @var StoreManagerInterface
      */
@@ -36,20 +30,16 @@ class CheckoutCartHandle
     /**
      * CheckoutCartHandle constructor.
      * @param CartItemRepositoryInterface $cartItemRepository
-     * @param DeviceHandle $deviceHandle
      * @param Session $checkoutSession
      * @codeCoverageIgnore
      */
     public function __construct(
         CartItemRepositoryInterface $cartItemRepository,
-        DeviceHandle $deviceHandle,
-        PrimeTarget $target,
         StoreManagerInterface $storeManager,
         Session $checkoutSession
-    ) {
+    )
+    {
         $this->cartItemRepository = $cartItemRepository;
-        $this->deviceHandle = $deviceHandle;
-        $this->target = $target;
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
     }
@@ -59,17 +49,27 @@ class CheckoutCartHandle
      * @return Target
      * @throws NoSuchEntityException
      */
-    public function processCartItemData(CartItemInterface $cartItem)
+    public function getCartItemData(CartItemInterface $cartItem)
     {
-        $this->target->setItemType(self::TYPE_TARGET);
-        $this->target->setItemId((string)$cartItem->getItemId());
+        $target = new PrimeTarget();
+        $target->setItemType(self::TYPE_TARGET);
+        $target->setItemId((string)$cartItem->getItemId());
+        $target->setProperties($this->getProperties($cartItem));
 
-        $cartProperties = $this->getProperties($cartItem);
-        $deviceProperties = $this->deviceHandle->getDeviceInfo();
-        $properties = array_merge($cartProperties, $deviceProperties);
-        $this->target->setProperties($properties);
+        return $target->createPrimeTarget();
+    }
 
-        return $this->target->createPrimeTarget();
+    /**
+     * @param CartItemInterface $cartItem
+     * @return array
+     */
+    public function getCartProperties(CartItemInterface $cartItem)
+    {
+        return [
+            'total_value'    => $cartItem->getRowTotal(),
+            'discount_value' => $cartItem->getRowTotal() - (float)$cartItem->getDiscountAmount(),
+            'currency'       => $this->storeManager->getStore()->getBaseCurrencyCode()
+        ];
     }
 
     /**
@@ -88,14 +88,11 @@ class CheckoutCartHandle
     protected function getProperties(CartItemInterface $cartItem)
     {
         return [
-            'cart_id'   => $this->checkoutSession->getQuoteId(),
-            'product_sku' => $cartItem->getSku(),
-            'qty'         => $cartItem->getQty(),
-            'price'       => $cartItem->getPrice(),
+            'cart_id'         => $this->checkoutSession->getQuoteId(),
+            'product_sku'     => $cartItem->getSku(),
+            'qty'             => $cartItem->getQty(),
+            'price'           => $cartItem->getPrice(),
             'discount_amount' => $cartItem->getDiscountAmount(),
-            'total_value'     => $cartItem->getRowTotal(),
-            'discount_value'  => $cartItem->getRowTotal() - (float)$cartItem->getDiscountAmount(),
-            'currency'      => $this->storeManager->getStore()->getBaseCurrencyCode()
         ];
     }
 }

@@ -15,7 +15,12 @@ class PrimeSource
     /**
      * @var string
      */
-    protected $itemId;
+    private $itemId;
+
+    /**
+     * @var array
+     */
+    private $properties;
 
     /**
      * @param string $itemType
@@ -30,7 +35,7 @@ class PrimeSource
     /**
      * @return string
      */
-    public function getItemType()
+    private function getItemType()
     {
         return $this->itemType;
     }
@@ -48,9 +53,27 @@ class PrimeSource
     /**
      * @return string
      */
-    public function getItemId()
+    private function getItemId()
     {
         return $this->itemId;
+    }
+
+    /**
+     * @param array $properties
+     * @return $this
+     */
+    public function setProperties(array $properties)
+    {
+        $this->properties = $properties;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    private function getProperties()
+    {
+        return $this->properties;
     }
 
     /**
@@ -58,6 +81,6 @@ class PrimeSource
      */
     public function createPrimeSource()
     {
-        return new PrimeSourceSdk($this->getItemType(), $this->getItemId(), []);
+        return new PrimeSourceSdk($this->getItemType(), $this->getItemId(), $this->getProperties());
     }
 }

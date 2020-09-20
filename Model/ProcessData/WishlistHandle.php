@@ -10,6 +10,7 @@ use Magento\Wishlist\Model\Item;
 use Magento\Wishlist\Model\Wishlist;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
 use Prime\Tracking\Target;
+use PrimeData\PrimeDataConnect\Model\UserInfo;
 
 class WishlistHandle
 {
@@ -26,10 +27,6 @@ class WishlistHandle
      * @var CustomerHandle
      */
     protected $customerHandle;
-    /**
-     * @var PrimeTarget
-     */
-    protected $target;
 
     /**
      * WishlistHandle constructor.
@@ -42,12 +39,10 @@ class WishlistHandle
     public function __construct(
         CustomerRepositoryInterface $customerRepository,
         CustomerHandle $customerHandle,
-        PrimeTarget $target,
         ProductHandle $productHandle
     ) {
         $this->customerRepository = $customerRepository;
         $this->customerHandle = $customerHandle;
-        $this->target = $target;
         $this->productHandle = $productHandle;
     }
 
@@ -60,9 +55,10 @@ class WishlistHandle
      */
     public function processWishlistData(Wishlist $wishlist, Item $item)
     {
+        $target = new PrimeTarget();
         $wishlistId = $wishlist->getId();
-        $this->target->setItemType(self::TYPE_TARGET);
-        $this->target->setItemId($wishlistId);
+        $target->setItemType(self::TYPE_TARGET);
+        $target->setItemId($wishlistId);
         $wishlistName = $wishlist->getName();
 
         $wishlistData['wishlist_name'] = $wishlistName;
@@ -70,9 +66,9 @@ class WishlistHandle
         $itemData = $this->getWishlistItem($item);
 
         $properties = array_merge($wishlistData, $customerData, $itemData);
-        $this->target->setProperties($properties);
+        $target->setProperties($properties);
 
-        return $this->target->createPrimeTarget();
+        return $target->createPrimeTarget();
     }
 
     /**
@@ -111,12 +107,11 @@ class WishlistHandle
 
     /**
      * @param Wishlist $wishlist
-     * @return string
-     * @throws LocalizedException
+     * @return UserInfo
      */
-    public function getSessionId(Wishlist $wishlist)
+    public function getProfile(Wishlist $wishlist)
     {
         $customerId = $wishlist->getCustomerId();
-        return $this->customerHandle->getCustomerSessionId((int)$customerId);
+        return new UserInfo($customerId, $this->customerHandle->getCustomerSessionId((int)$customerId));
     }
 }

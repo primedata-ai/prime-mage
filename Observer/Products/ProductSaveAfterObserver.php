@@ -46,7 +46,8 @@ class ProductSaveAfterObserver implements ObserverInterface
         SyncHandle $syncHandle,
         LoggerInterface $logger,
         ProductHandle $productHandle
-    ) {
+    )
+    {
         $this->syncConfig = $config;
         $this->productHandle = $productHandle;
         $this->syncHandle = $syncHandle;
@@ -62,12 +63,13 @@ class ProductSaveAfterObserver implements ObserverInterface
             /* @var Product $product */
             $product = $observer->getEvent()->getProduct();
             try {
-                $productTarget = $this->productHandle->processProductSync($product);
+                $productTarget = $this->productHandle->getProductSync($product);
                 $sessionId = $this->productHandle->getSessionId();
-                $this->syncHandle->synDataToPrime(self::EVENT_UPDATE_CREATE_PRODUCT, $sessionId, $productTarget);
+                // @TODO: Sync Entity Schema later
+//                $this->syncHandle->synDataToPrime(self::EVENT_UPDATE_CREATE_PRODUCT, $sessionId, $productTarget);
             } catch (\Exception $exception) {
                 $this->logger->error(self::EVENT_UPDATE_CREATE_PRODUCT, [
-                    'message' =>  $exception->getMessage(), 'trace' => $exception->getTraceAsString()
+                    'message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()
                 ]);
             }
         }

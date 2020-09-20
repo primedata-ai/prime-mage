@@ -7,23 +7,16 @@ use Magento\Checkout\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
 use Prime\Tracking\Target;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
+use PrimeData\PrimeDataConnect\Model\UserInfo;
 
 class SalesOrderHandle
 {
-    const TYPE_TARGET = 'create_order';
+    const TYPE_TARGET = 'order';
 
     /**
      * @var CustomerHandle
      */
     protected $customerHandle;
-    /**
-     * @var DeviceHandle
-     */
-    protected $deviceHandle;
-    /**
-     * @var PrimeTarget
-     */
-    protected $target;
 
     /**
      * @var Session
@@ -33,20 +26,14 @@ class SalesOrderHandle
     /**
      * SalesOrderHandle constructor.
      * @param CustomerHandle $customerHandle
-     * @param DeviceHandle $deviceHandle
      * @param Session $checkoutSession
-     * @param PrimeTarget $target
      */
     public function __construct(
-        CustomerHandle $customerHandle,
-        DeviceHandle $deviceHandle,
-        Session $checkoutSession,
-        PrimeTarget $target
-    ) {
+        CustomerHandle $customerHandle, Session $checkoutSession
+    )
+    {
         $this->customerHandle = $customerHandle;
-        $this->deviceHandle = $deviceHandle;
         $this->checkoutSession = $checkoutSession;
-        $this->target = $target;
     }
 
     /**
@@ -55,15 +42,21 @@ class SalesOrderHandle
      */
     public function processOrderData(OrderInterface $order)
     {
-        $this->target->setItemType(self::TYPE_TARGET);
-        $this->target->setItemId((string)$order->getEntityId());
-        $orderProperties = $this->getOrderProperties($order);
-        $customerProperties = $this->getCustomerProperties($order);
-        $deviceProperties = $this->deviceHandle->getDeviceInfo();
+        $target = new PrimeTarget();
+        $target->setItemType(self::TYPE_TARGET);
+        $target->setItemId((string)$order->getEntityId());
+        $orderProperties = $this->getOrderInfo($order);
+        $target->setProperties($orderProperties);
+        return $target->createPrimeTarget();
+    }
 
-        $properties = array_merge($orderProperties, $customerProperties, $deviceProperties);
-        $this->target->setProperties($properties);
-        return $this->target->createPrimeTarget();
+    /**
+     * @param OrderInterface $order
+     * @return UserInfo
+     */
+    public function getProfile(OrderInterface $order)
+    {
+        return new UserInfo($order->getCustomerId(), $this->getSessionId());
     }
 
     /**
@@ -78,17 +71,19 @@ class SalesOrderHandle
      * @param OrderInterface $order
      * @return array
      */
-    protected function getOrderProperties(OrderInterface $order) :array
+    private function getOrderInfo(OrderInterface $order)
     {
         return [
-            'increment_id' => $order->getIncrementId(),
-            'subtotal'  => $order->getBaseSubtotal(),
-            'shipping_amount' => $order->getShippingAmount(),
-            'grand_total' => $order->getGrandTotal(),
+            'weight'          => $order->getWeight(),
+            'virtual'         => $order->getIsVirtual(),
+            'coupon'          => !empty($order->getCouponCode()),
+            'tax_amount'      => $order->getTaxAmount(),
+            'increment_id'    => $order->getIncrementId(),
+            'subtotal'        => $order->getBaseSubtotal(),
+            'grand_total'     => $order->getGrandTotal(),
             'discount_amount' => $order->getDiscountAmount(),
-            'tax_amount' => $order->getTaxAmount(),
-            'payment_method' => $order->getPayment()->getMethod(),
-            'currency' => $order->getOrderCurrencyCode()
+            'shipping_amount' => $order->getShippingAmount(),
+            'payment_method'  => $order->getPayment()->getMethod(),
         ];
     }
 
@@ -96,12 +91,25 @@ class SalesOrderHandle
      * @param OrderInterface $order
      * @return array
      */
-    protected function getCustomerProperties(OrderInterface $order) :array
+    public function getOrderProperties(OrderInterface $order): array
     {
         return [
-            'email' => $order->getCustomerEmail(),
-            'first_name' => $order->getCustomerFirstname(),
-            'last_name' => $order->getCustomerLastname(),
+            'discount_value' => $order->getTotalPaid() - $order->getDiscountAcmount(),
+            'total_value'    => $order->getTotalPaid(),
+            'currency'       => $order->getOrderCurrencyCode()
+        ];
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @return array
+     */
+    private function getCustomerProperties(OrderInterface $order): array
+    {
+        return [
+            'email'       => $order->getCustomerEmail(),
+            'first_name'  => $order->getCustomerFirstname(),
+            'last_name'   => $order->getCustomerLastname(),
             'customer_id' => $order->getCustomerId()
         ];
     }

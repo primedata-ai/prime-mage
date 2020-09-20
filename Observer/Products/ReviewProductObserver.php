@@ -43,7 +43,8 @@ class ReviewProductObserver implements ObserverInterface
         LoggerInterface $logger,
         ReviewHandle $reviewHandle,
         SyncHandle $syncHandle
-    ) {
+    )
+    {
         $this->config = $config;
         $this->logger = $logger;
         $this->reviewHandle = $reviewHandle;
@@ -58,9 +59,14 @@ class ReviewProductObserver implements ObserverInterface
         if ($this->config->isSyncReview()) {
             $review = $observer->getEvent()->getDataObject();
             try {
-                $reviewTarget = $this->reviewHandle->processReviewData($review);
-                $sessionId = $this->reviewHandle->getSessionId($review);
-                $this->syncHandle->synDataToPrime(self::EVENT_SYNC_REVIEW, $sessionId, $reviewTarget);
+                $reviewTarget = $this->reviewHandle->getProductInfo($review);
+                $properties = $this->reviewHandle->getReviewInfo($review);
+                $profile = $this->reviewHandle->getProfile($review);
+                $this->syncHandle->synDataToPrime(self::EVENT_SYNC_REVIEW,
+                    $profile->getUserID(),
+                    $reviewTarget,
+                    $properties,
+                    $profile->getSessionID());
             } catch (\Exception $e) {
                 $this->logger->error(
                     self::EVENT_SYNC_REVIEW,
