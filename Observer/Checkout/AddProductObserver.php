@@ -43,8 +43,7 @@ class AddProductObserver implements ObserverInterface
         LoggerInterface $logger,
         CheckoutCartHandle $checkoutCartHandle,
         SyncHandle $syncHandle
-    )
-    {
+    ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->checkoutCartHandle = $checkoutCartHandle;

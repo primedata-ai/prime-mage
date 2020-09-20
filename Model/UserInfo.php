@@ -1,8 +1,6 @@
 <?php
 
-
 namespace PrimeData\PrimeDataConnect\Model;
-
 
 class UserInfo
 {
@@ -10,7 +8,7 @@ class UserInfo
     private $sessionID;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUserID()
     {
@@ -18,7 +16,7 @@ class UserInfo
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getSessionID()
     {
@@ -27,10 +25,10 @@ class UserInfo
 
     /**
      * UserInfo constructor.
-     * @param $userID
-     * @param $sessionID
+     * @param string $userID
+     * @param string $sessionID
      */
-    public function __construct($userID, $sessionID)
+    public function __construct(string $userID, string $sessionID)
     {
         $this->userID = $userID;
         $this->sessionID = $sessionID;

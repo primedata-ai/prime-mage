@@ -44,8 +44,7 @@ class AddWishlistObserver implements ObserverInterface
         LoggerInterface $logger,
         WishlistHandle $wishlistHandle,
         SyncHandle $syncHandle
-    )
-    {
+    ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->wishlistHandle = $wishlistHandle;
@@ -63,11 +62,13 @@ class AddWishlistObserver implements ObserverInterface
             try {
                 $wishlistTarget = $this->wishlistHandle->processWishlistData($wishlist, $item);
                 $userInfo = $this->wishlistHandle->getProfile($wishlist);
-                $this->syncHandle->synDataToPrime(self::EVENT_WISHLIST,
+                $this->syncHandle->synDataToPrime(
+                    self::EVENT_WISHLIST,
                     $userInfo->getUserID(),
                     $wishlistTarget,
                     [],
-                    $userInfo->getSessionID());
+                    $userInfo->getSessionID()
+                );
             } catch (\Exception $exception) {
                 $this->logger->error(self::EVENT_WISHLIST, [
                     'message' => $exception->getMessage(),

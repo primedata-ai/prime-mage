@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace PrimeData\PrimeDataConnect\Model\ProcessData;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Prime\Tracking\Target;
@@ -26,8 +25,7 @@ class ProductHandle
      */
     public function __construct(
         StoreManagerInterface $storeManager
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
     }
 

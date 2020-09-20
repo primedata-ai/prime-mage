@@ -108,6 +108,7 @@ class WishlistHandle
     /**
      * @param Wishlist $wishlist
      * @return UserInfo
+     * @throws LocalizedException
      */
     public function getProfile(Wishlist $wishlist)
     {

@@ -15,7 +15,6 @@ use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
 use PrimeData\PrimeDataConnect\Model\PrimeConfig;
 use PrimeData\PrimeDataConnect\Model\ProcessData\DeviceHandle;
-use PrimeData\PrimeDataConnect\Model\Tracking\PrimeEvent;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeSource;
 use Psr\Log\LoggerInterface;
 
@@ -57,6 +56,9 @@ class SyncHandle
      */
     protected $storeManager;
 
+    /**
+     * @var QueueBuffer
+     */
     protected $queueManage;
 
     /**
@@ -71,6 +73,8 @@ class SyncHandle
      * @param PrimeConfig $primeConfig
      * @param QueueBuffer $queueBuffer
      * @param StoreManagerInterface $storeManager
+     * @param PrimeHelperConfig $helperConfig
+     * @param DeviceHandle $deviceHandle
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -82,8 +86,7 @@ class SyncHandle
         PrimeHelperConfig $helperConfig,
         DeviceHandle $deviceHandle,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->objectManager = $objectManager;
         $this->primeClient = $primeClient;
         $this->deviceHandler = $deviceHandle;
@@ -122,9 +125,15 @@ class SyncHandle
      * @param array $properties
      * @param string $sessionId
      * @throws \ErrorException
+     * @throws NoSuchEntityException
      */
-    public function synDataToPrime(string $eventName, string $userId, Target $target, array $properties = [], string $sessionId = "")
-    {
+    public function synDataToPrime(
+        string $eventName,
+        string $userId,
+        Target $target,
+        array $properties = [],
+        string $sessionId = ""
+    ) {
         if (!$eventName) {
             throw new \ErrorException('Missing Event Name');
         }

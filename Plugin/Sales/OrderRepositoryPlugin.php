@@ -43,8 +43,7 @@ class OrderRepositoryPlugin
         LoggerInterface $logger,
         SalesOrderHandle $saleOrderHandle,
         SyncHandle $syncHandle
-    )
-    {
+    ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->saleOrderHandle = $saleOrderHandle;
@@ -74,13 +73,15 @@ class OrderRepositoryPlugin
     {
         try {
             $targetOrder = $this->saleOrderHandle->processOrderData($order);
-            $properties = $this->saleOrderHandle->getOrderProperties();
+            $properties = $this->saleOrderHandle->getOrderProperties($order);
             $profile = $this->saleOrderHandle->getProfile($order);
-            $this->syncHandle->synDataToPrime(self::EVENT_SYNC,
-                $profile->getUserID(),
+            $this->syncHandle->synDataToPrime(
+                self::EVENT_SYNC,
+                (string)$profile->getUserID(),
                 $targetOrder,
                 $properties,
-                $profile->getSessionID());
+                $profile->getSessionID()
+            );
         } catch (\Exception $e) {
             $this->logger->error(self::EVENT_SYNC, [
                 'message' => $e->getMessage(),

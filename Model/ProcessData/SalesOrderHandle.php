@@ -29,9 +29,9 @@ class SalesOrderHandle
      * @param Session $checkoutSession
      */
     public function __construct(
-        CustomerHandle $customerHandle, Session $checkoutSession
-    )
-    {
+        CustomerHandle $customerHandle,
+        Session $checkoutSession
+    ) {
         $this->customerHandle = $customerHandle;
         $this->checkoutSession = $checkoutSession;
     }

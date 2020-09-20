@@ -30,6 +30,7 @@ class CheckoutCartHandle
     /**
      * CheckoutCartHandle constructor.
      * @param CartItemRepositoryInterface $cartItemRepository
+     * @param StoreManagerInterface $storeManager
      * @param Session $checkoutSession
      * @codeCoverageIgnore
      */
@@ -37,8 +38,7 @@ class CheckoutCartHandle
         CartItemRepositoryInterface $cartItemRepository,
         StoreManagerInterface $storeManager,
         Session $checkoutSession
-    )
-    {
+    ) {
         $this->cartItemRepository = $cartItemRepository;
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -47,7 +47,6 @@ class CheckoutCartHandle
     /**
      * @param CartItemInterface $cartItem
      * @return Target
-     * @throws NoSuchEntityException
      */
     public function getCartItemData(CartItemInterface $cartItem)
     {
@@ -62,6 +61,7 @@ class CheckoutCartHandle
     /**
      * @param CartItemInterface $cartItem
      * @return array
+     * @throws NoSuchEntityException
      */
     public function getCartProperties(CartItemInterface $cartItem)
     {
@@ -83,7 +83,6 @@ class CheckoutCartHandle
     /**
      * @param CartItemInterface $cartItem
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getProperties(CartItemInterface $cartItem)
     {

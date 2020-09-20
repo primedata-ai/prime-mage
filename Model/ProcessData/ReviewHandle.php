@@ -49,9 +49,11 @@ class ReviewHandle
      * @codeCoverageIgnore
      */
     public function __construct(
-        ProductRepository $productRepository, CustomerRepositoryInterface $customerRepository, CustomerHandle $customerHandle, StoreManagerInterface $storeManager
-    )
-    {
+        ProductRepository $productRepository,
+        CustomerRepositoryInterface $customerRepository,
+        CustomerHandle $customerHandle,
+        StoreManagerInterface $storeManager
+    ) {
         $this->customerRepository = $customerRepository;
         $this->productRepository = $productRepository;
         $this->customerHandle = $customerHandle;
@@ -61,21 +63,22 @@ class ReviewHandle
     /**
      * @param Review $review
      * @return Target
+     * @throws NoSuchEntityException
      */
     public function getProductInfo(Review $review)
     {
         $target = new PrimeTarget();
         $target->setItemType(self::TYPE_TARGET);
         $productId = $review->getEntityPkValue();
-        $target->setItemId($productId);
+        $target->setItemId((string)$productId);
 
         $product = $this->productRepository->getById($productId);
         $storeId = $this->storeManager->getStore()->getId();
-        $propertity = [
+        $properties = [
             'name' => $product->getName(),
             'url'  => $review->getProductUrl((int)$productId, (int)$storeId),
         ];
-        $target->setProperties($propertity);
+        $target->setProperties($properties);
         return $target->createPrimeTarget();
     }
 
@@ -85,7 +88,6 @@ class ReviewHandle
      */
     public function getReviewInfo(Review $review)
     {
-
         $target = new PrimeTarget();
         $target->setItemType(self::TYPE_TARGET);
         $target->setItemId($review->getId());
@@ -123,6 +125,6 @@ class ReviewHandle
     public function getProfile(Review $review)
     {
         $customerId = $review->getCustomerId();
-        return new UserInfo($customerId, $this->customerHandle->getCustomerSessionId((int)$customerId));
+        return new UserInfo((int)$customerId, $this->customerHandle->getCustomerSessionId((int)$customerId));
     }
 }

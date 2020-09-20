@@ -46,8 +46,7 @@ class ProductSaveAfterObserver implements ObserverInterface
         SyncHandle $syncHandle,
         LoggerInterface $logger,
         ProductHandle $productHandle
-    )
-    {
+    ) {
         $this->syncConfig = $config;
         $this->productHandle = $productHandle;
         $this->syncHandle = $syncHandle;
