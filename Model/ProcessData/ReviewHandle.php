@@ -11,10 +11,11 @@ use Magento\Review\Model\Review;
 use Magento\Store\Model\StoreManagerInterface;
 use Prime\Tracking\Target;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeTarget;
+use PrimeData\PrimeDataConnect\Model\UserInfo;
 
 class ReviewHandle
 {
-    const TYPE_TARGET =  'review_product';
+    const TYPE_TARGET = 'product';
     /**
      * @var Review
      */
@@ -38,74 +39,61 @@ class ReviewHandle
      * @var StoreManagerInterface
      */
     protected $storeManager;
-    /**
-     * @var PrimeTarget
-     */
-    protected $target;
 
     /**
      * ReviewHandle constructor.
      * @param ProductRepository $productRepository
      * @param CustomerRepositoryInterface $customerRepository
      * @param CustomerHandle $customerHandle
-     * @param PrimeTarget $target
      * @param StoreManagerInterface $storeManager
      * @codeCoverageIgnore
      */
     public function __construct(
-        ProductRepository $productRepository,
-        CustomerRepositoryInterface $customerRepository,
-        CustomerHandle $customerHandle,
-        PrimeTarget $target,
-        StoreManagerInterface $storeManager
-    ) {
+        ProductRepository $productRepository, CustomerRepositoryInterface $customerRepository, CustomerHandle $customerHandle, StoreManagerInterface $storeManager
+    )
+    {
         $this->customerRepository = $customerRepository;
         $this->productRepository = $productRepository;
         $this->customerHandle = $customerHandle;
-        $this->target = $target;
         $this->storeManager = $storeManager;
     }
 
     /**
      * @param Review $review
      * @return Target
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
-    public function processReviewData(Review $review)
+    public function getProductInfo(Review $review)
     {
-        $this->target->setItemType(self::TYPE_TARGET);
-        $this->target->setItemId($review->getId());
-
-        $reviewData = [
-            'review_title'   => $review->getTitle(),
-            'review_nickname' => $review->getNickname(),
-            'review_message' => $review->getDetail()
-        ];
+        $target = new PrimeTarget();
+        $target->setItemType(self::TYPE_TARGET);
         $productId = $review->getEntityPkValue();
-        $customerId = $review->getCustomerId() ?: 0;
-        $reviewerInfo = $this->getCustomerData((int)$customerId);
-        $reviewData = array_merge($reviewData, $reviewerInfo);
-        $reviewProductData = $this->getProductInfo((int)$productId);
-        $storeId = $this->storeManager->getStore()->getId();
-        $reviewProductData['product_url'] = $review->getProductUrl((int)$productId, (int)$storeId);
+        $target->setItemId($productId);
 
-        $properties = array_merge($reviewData, $reviewProductData);
-        $this->target->setProperties($properties);
-        return  $this->target->createPrimeTarget();
+        $product = $this->productRepository->getById($productId);
+        $storeId = $this->storeManager->getStore()->getId();
+        $propertity = [
+            'name' => $product->getName(),
+            'url'  => $review->getProductUrl((int)$productId, (int)$storeId),
+        ];
+        $target->setProperties($propertity);
+        return $target->createPrimeTarget();
     }
 
     /**
-     * @param int $productId
+     * @param Review $review
      * @return array
-     * @throws NoSuchEntityException
      */
-    protected function getProductInfo(int $productId)
+    public function getReviewInfo(Review $review)
     {
-        $product = $this->productRepository->getById($productId);
+
+        $target = new PrimeTarget();
+        $target->setItemType(self::TYPE_TARGET);
+        $target->setItemId($review->getId());
+
         return [
-            'product_id' => $productId,
-            'product_name' => $product->getName()
+            'review_title'    => $review->getTitle(),
+            'review_nickname' => $review->getNickname(),
+            'review_message'  => $review->getDetail()
         ];
     }
 
@@ -123,18 +111,18 @@ class ReviewHandle
 
         $customer = $this->customerRepository->getById($customerId);
         return [
-            'customer_id' => $customer->getId(),
+            'customer_id'    => $customer->getId(),
             'customer_email' => $customer->getEmail()
         ];
     }
 
     /**
      * @param Review $review
-     * @return string|null
+     * @return UserInfo
      */
-    public function getSessionId(Review $review)
+    public function getProfile(Review $review)
     {
-        $customerId = $review->getCustomerId() ?: 0;
-        return $this->customerHandle->getCustomerSessionId((int)$customerId);
+        $customerId = $review->getCustomerId();
+        return new UserInfo($customerId, $this->customerHandle->getCustomerSessionId((int)$customerId));
     }
 }

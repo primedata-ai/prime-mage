@@ -15,6 +15,7 @@ use PrimeData\PrimeDataConnect\Helper\RedisConfig;
 use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
 use PrimeData\PrimeDataConnect\Model\PrimeConfig;
+use PrimeData\PrimeDataConnect\Model\ProcessData\DeviceHandle;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeEvent;
 use PrimeData\PrimeDataConnect\Model\Tracking\PrimeSource;
 use Psr\Log\LoggerInterface;
@@ -39,10 +40,6 @@ class SyncHandle
      */
     private $primeClient;
     /**
-     * @var PrimeEvent
-     */
-    private $primeEvent;
-    /**
      * @var PrimeConfig
      */
     private $primeConfig;
@@ -55,19 +52,11 @@ class SyncHandle
      * @var LoggerInterface
      */
     protected $logger;
-    /**
-     * @var string
-     */
-    protected $messageQueueCode;
 
     /**
      * @var mixed
      */
     private $queueConnect;
-    /**
-     * @var PrimeSource
-     */
-    protected $primeSource;
 
     /**
      * @var StoreManagerInterface
@@ -77,11 +66,14 @@ class SyncHandle
     protected $queueManage;
 
     /**
+     * @var DeviceHandle
+     */
+    private $deviceHandler;
+
+    /**
      * SyncHandle constructor.
      * @param ObjectManagerFactory $objectManagerFactory
      * @param PrimeClient $primeClient
-     * @param PrimeEvent $primeEvent
-     * @param PrimeSource $primeSource
      * @param PrimeConfig $primeConfig
      * @param QueueBuffer $queueBuffer
      * @param StoreManagerInterface $storeManager
@@ -90,20 +82,19 @@ class SyncHandle
     public function __construct(
         ObjectManagerFactory $objectManagerFactory,
         PrimeClient $primeClient,
-        PrimeEvent $primeEvent,
-        PrimeSource $primeSource,
         PrimeConfig $primeConfig,
         QueueBuffer $queueBuffer,
         StoreManagerInterface $storeManager,
         PrimeHelperConfig $helperConfig,
+        DeviceHandle $deviceHandle,
         LoggerInterface $logger
-    ) {
+    )
+    {
         $this->objectManagerFactory = $objectManagerFactory;
         $this->primeClient = $primeClient;
-        $this->primeEvent = $primeEvent;
-        $this->primeSource = $primeSource;
+        $this->deviceHandler = $deviceHandle;
         $this->primeConfig = $primeConfig;
-        $this->queueBuffer  = $queueBuffer;
+        $this->queueBuffer = $queueBuffer;
         $this->storeManager = $storeManager;
         $this->logger = $logger;
 
@@ -145,12 +136,13 @@ class SyncHandle
 
     /**
      * @param string $eventName
-     * @param string $sessionId
+     * @param string $userId
      * @param Target $target
+     * @param array $properties
+     * @param string $sessionId
      * @throws \ErrorException
-     * @throws NoSuchEntityException
      */
-    public function synDataToPrime(string $eventName, string $sessionId, Target $target)
+    public function synDataToPrime(string $eventName, string $userId, Target $target, array $properties = [], string $sessionId = "")
     {
         if (!$eventName) {
             throw new \ErrorException('Missing Event Name');
@@ -164,7 +156,8 @@ class SyncHandle
         $source = $this->createPrimeSource();
         $primeClient->track(
             $eventName,
-            [],
+            $properties,
+            Event::withProfileID($userId),
             Event::withSessionID($sessionId),
             Event::withSource($source),
             Event::withTarget($target)
@@ -196,10 +189,12 @@ class SyncHandle
      */
     protected function createPrimeSource()
     {
-        $this->primeSource->setItemType(self::SOURCE_DEFINE);
         $storeUrl = $this->storeManager->getStore()->getBaseUrl();
-        $this->primeSource->setItemId($storeUrl);
+        $primeSource = new PrimeSource();
+        $primeSource->setItemType(self::SOURCE_DEFINE);
+        $primeSource->setItemId($storeUrl);
+        $primeSource->setProperties($this->deviceHandler->getDeviceInfo());
 
-        return $this->primeSource->createPrimeSource();
+        return $primeSource->createPrimeSource();
     }
 }

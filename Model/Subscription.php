@@ -49,7 +49,7 @@ class Subscription implements SubscriptionInterface
                 'subscribe_at'  => $subscribeAt
             ];
 
-            $this->syncHandle->synDataToPrime(self::EVENT_NAME, $dataNewsletters);
+            $this->syncHandle->synDataToPrime(self::EVENT_NAME, (string) $customerId, null, $dataNewsletters, "");
         }
     }
 }

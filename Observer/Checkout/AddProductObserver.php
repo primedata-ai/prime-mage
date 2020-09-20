@@ -43,7 +43,8 @@ class AddProductObserver implements ObserverInterface
         LoggerInterface $logger,
         CheckoutCartHandle $checkoutCartHandle,
         SyncHandle $syncHandle
-    ) {
+    )
+    {
         $this->config = $config;
         $this->logger = $logger;
         $this->checkoutCartHandle = $checkoutCartHandle;
@@ -59,12 +60,13 @@ class AddProductObserver implements ObserverInterface
             try {
                 $cartItem = $observer->getEvent()->getQuoteItem();
                 $sessionId = $this->checkoutCartHandle->getSessionId();
-                $properties = $this->checkoutCartHandle->processCartItemData($cartItem);
-                $this->syncHandle->synDataToPrime(self::SYNC_EVENT, $sessionId, $properties);
+                $item = $this->checkoutCartHandle->getCartItemData($cartItem);
+                $properties = $this->checkoutCartHandle->getCartProperties($cartItem);
+                $this->syncHandle->synDataToPrime(self::SYNC_EVENT, $sessionId, $item, $properties);
             } catch (\Exception $e) {
                 $this->logger->error(self::SYNC_EVENT, [
-                   'message' => $e->getMessage(),
-                   'trace'    => $e->getTraceAsString()
+                    'message' => $e->getMessage(),
+                    'trace'   => $e->getTraceAsString()
                 ]);
             }
         }
