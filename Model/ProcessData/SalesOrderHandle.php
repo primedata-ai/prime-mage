@@ -74,14 +74,20 @@ class SalesOrderHandle
         return $this->checkoutSession->getSessionId();
     }
 
+    /**
+     * @param OrderInterface $order
+     * @return array
+     */
     protected function getOrderProperties(OrderInterface $order) :array
     {
         return [
             'increment_id' => $order->getIncrementId(),
             'subtotal'  => $order->getBaseSubtotal(),
+            'shipping_amount' => $order->getShippingAmount(),
             'grand_total' => $order->getGrandTotal(),
             'discount_amount' => $order->getDiscountAmount(),
             'tax_amount' => $order->getTaxAmount(),
+            'payment_method' => $order->getPayment()->getMethod(),
             'currency' => $order->getOrderCurrencyCode()
         ];
     }
