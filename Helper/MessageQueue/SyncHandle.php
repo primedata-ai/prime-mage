@@ -3,25 +3,26 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Helper\MessageQueue;
 
-use Magento\Framework\App\ObjectManagerFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Prime\Tracking\Event;
+use Prime\Tracking\Source;
+use Prime\Tracking\Target;
+use PrimeData\PrimeDataConnect\Helper\Config as PrimeHelperConfig;
 use PrimeData\PrimeDataConnect\Helper\RedisConfig;
 use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
 use PrimeData\PrimeDataConnect\Model\PrimeConfig;
-use PrimeData\PrimeDataConnect\Model\Tracking\PrimeEvent;
+use PrimeData\PrimeDataConnect\Model\ProcessData\DeviceHandle;
+use PrimeData\PrimeDataConnect\Model\Tracking\PrimeSource;
 use Psr\Log\LoggerInterface;
 
 class SyncHandle
 {
     const MESSAGE_QUEUE_DEFAULT = 'redis';
-    const DEFAULT_SESSION_ID = '1e85YTciGhH6vLfLpmqhJfhFhpq';
-    const SESSION_ID = 'session_id';
-
-    /**
-     * @var ObjectManagerFactory
-     */
-    protected $objectManagerFactory;
+    const SCOPE_DEFAULT = 'website';
+    const SOURCE_DEFINE = 'site';
 
     /**
      * @var ObjectManagerInterface
@@ -31,10 +32,6 @@ class SyncHandle
      * @var PrimeClient
      */
     private $primeClient;
-    /**
-     * @var PrimeEvent
-     */
-    private $primeEvent;
     /**
      * @var PrimeConfig
      */
@@ -48,119 +45,146 @@ class SyncHandle
      * @var LoggerInterface
      */
     protected $logger;
-    /**
-     * @var string
-     */
-    protected $messageQueueCode;
 
+    /**
+     * @var mixed
+     */
     private $queueConnect;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var QueueBuffer
+     */
+    protected $queueManage;
+
+    /**
+     * @var DeviceHandle
+     */
+    private $deviceHandler;
+
+    /**
      * SyncHandle constructor.
-     * @param ObjectManagerFactory $objectManagerFactory
+     * @param ObjectManagerInterface $objectManager
      * @param PrimeClient $primeClient
-     * @param PrimeEvent $primeEvent
      * @param PrimeConfig $primeConfig
      * @param QueueBuffer $queueBuffer
+     * @param StoreManagerInterface $storeManager
+     * @param PrimeHelperConfig $helperConfig
+     * @param DeviceHandle $deviceHandle
      * @param LoggerInterface $logger
-     * @param array $data
-     * @codeCoverageIgnore
      */
     public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
+        ObjectManagerInterface $objectManager,
         PrimeClient $primeClient,
-        PrimeEvent $primeEvent,
         PrimeConfig $primeConfig,
         QueueBuffer $queueBuffer,
-        LoggerInterface $logger,
-        array $data = []
+        StoreManagerInterface $storeManager,
+        PrimeHelperConfig $helperConfig,
+        DeviceHandle $deviceHandle,
+        LoggerInterface $logger
     ) {
-        $this->objectManagerFactory = $objectManagerFactory;
+        $this->objectManager = $objectManager;
         $this->primeClient = $primeClient;
-        $this->primeEvent = $primeEvent;
+        $this->deviceHandler = $deviceHandle;
         $this->primeConfig = $primeConfig;
-        $this->queueBuffer  = $queueBuffer;
+        $this->queueBuffer = $queueBuffer;
+        $this->storeManager = $storeManager;
         $this->logger = $logger;
-        $this->data = $data;
-        $this->queueConnect = $this->getMessageQueueConnect();
+
+        $messageConfig = $helperConfig->getTransport();
+        $this->queueConnect = $this->getMessageQueueConnect($messageConfig);
+        $connect = $this->queueConnect->getConnection();
+        $this->queueManage = $this->queueBuffer->createQueueManage($connect);
     }
 
     /**
-     * Gets initialized object manager
-     *
-     * @return ObjectManagerInterface
+     * @param string $transport
+     * @return MessageConfigInterface
      */
-    protected function getObjectManager()
+    protected function getMessageQueueConnect(string $transport)
     {
-        if (null == $this->objectManager) {
-            $this->objectManager = $this->objectManagerFactory->create($_SERVER);
-        }
-        return $this->objectManager;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getMessageQueueConnect()
-    {
-        switch ($this->messageQueueCode) {
+        switch ($transport) {
             case self::MESSAGE_QUEUE_DEFAULT:
-                $this->queueConnect = $this->getObjectManager()->create(RedisConfig::class);
+                $this->queueConnect = $this->objectManager->create(RedisConfig::class);
+                break;
+            default:
+                $this->queueConnect = $this->objectManager->create(RedisConfig::class);
         }
 
         return $this->queueConnect;
     }
 
     /**
-     * @param string $messageQueueCode
-     * @return $this
+     * @param string $eventName
+     * @param string $userId
+     * @param Target $target
+     * @param array $properties
+     * @param string $sessionId
+     * @throws \ErrorException
+     * @throws NoSuchEntityException
      */
-    public function setMessageQueueCode(string $messageQueueCode)
-    {
-        $this->messageQueueCode = $messageQueueCode;
-        return $this;
+    public function synDataToPrime(
+        string $eventName,
+        string $userId,
+        Target $target,
+        array $properties = [],
+        string $sessionId = ""
+    ) {
+        if (!$eventName) {
+            throw new \ErrorException('Missing Event Name');
+        }
+
+        if (!$sessionId) {
+            throw new \ErrorException('Missing Session Id event to sync');
+        }
+
+        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+        $source = $this->createPrimeSource();
+        $primeClient->track(
+            $eventName,
+            $properties,
+            Event::withProfileID($userId),
+            Event::withSessionID($sessionId),
+            Event::withSource($source),
+            Event::withTarget($target)
+        );
     }
 
     /**
-     * @param string $eventName
+     * @param int $customerId
      * @param array $data
-     * @param array $properties
      * @throws \ErrorException
-     * @throws \Exception
      */
-    public function synDataToPrime(string $eventName, array $data, array $properties = [])
+    public function syncIdentifyToPrime(int $customerId, array $data)
     {
-        $this->queueConnect = $this->getMessageQueueConnect();
-        if (!$eventName) {
-            throw new \ErrorException('Missing Event Name');
+        if (!$customerId) {
+            throw new \ErrorException('Missing Customer Id');
         }
 
         if (!$data) {
             throw new \ErrorException('Missing data to sync');
         }
 
-        $connect = $this->queueConnect->getConnection();
-        $queueBuffer = $this->queueBuffer->createQueueManage($connect);
-        $primeClient = $this->primeClient->setQueueBuffer($queueBuffer)->getPrimeClient();
-
-        $this->primeEvent = $this->getEventData($properties);
-        $primeClient->track($eventName, $data, $this->primeClient);
+        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+        $primeClient->identify($customerId, $data);
     }
 
     /**
-     * @param array $properties
-     * @return array|PrimeEvent
+     * @return Source
+     * @throws NoSuchEntityException
      */
-    public function getEventData(array $properties)
+    protected function createPrimeSource()
     {
-        if (!$properties) {
-            $this->primeEvent->setSessionId(self::DEFAULT_SESSION_ID);
-        }
+        $storeUrl = $this->storeManager->getStore()->getBaseUrl();
+        $primeSource = new PrimeSource();
+        $primeSource->setItemType(self::SOURCE_DEFINE);
+        $primeSource->setItemId($storeUrl);
+        $primeSource->setProperties($this->deviceHandler->getDeviceInfo());
 
-        if (isset($properties[self::SESSION_ID])) {
-            $this->primeEvent->setSessionId($properties[self::SESSION_ID]);
-        }
-
-        return  $this->primeEvent;
+        return $primeSource->createPrimeSource();
     }
 }

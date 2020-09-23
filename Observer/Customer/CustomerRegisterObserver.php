@@ -9,6 +9,7 @@ use Magento\Framework\Event\ObserverInterface;
 use PrimeData\PrimeDataConnect\Helper\MessageQueue\SyncHandle;
 use PrimeData\PrimeDataConnect\Helper\SyncConfig;
 use PrimeData\PrimeDataConnect\Model\ProcessData\CustomerHandle;
+use PrimeData\PrimeDataConnect\Model\ProcessData\DeviceHandle;
 use Psr\Log\LoggerInterface;
 
 class CustomerRegisterObserver implements ObserverInterface
@@ -34,25 +35,31 @@ class CustomerRegisterObserver implements ObserverInterface
      * @var CustomerHandle
      */
     private $customerHandle;
+    /**
+     * @var DeviceHandle
+     */
+    private $deviceHandle;
 
     /**
      * CustomerRegisterObserver constructor.
      * @param SyncConfig $config
      * @param LoggerInterface $logger
      * @param CustomerHandle $customerHandle
+     * @param DeviceHandle $deviceHandle
      * @param SyncHandle $syncHandle
-     * @codeCoverageIgnore
      */
     public function __construct(
         SyncConfig $config,
         LoggerInterface $logger,
         CustomerHandle $customerHandle,
+        DeviceHandle $deviceHandle,
         SyncHandle $syncHandle
     ) {
         $this->config = $config;
         $this->syncHandle = $syncHandle;
         $this->logger = $logger;
         $this->customerHandle = $customerHandle;
+        $this->deviceHandle = $deviceHandle;
     }
 
     /**
@@ -66,10 +73,10 @@ class CustomerRegisterObserver implements ObserverInterface
             try {
                 $email = $customerData->getEmail();
                 $customer = $this->customerHandle->getCustomerByEmail($email);
-                $customerData = $this->customerHandle->processCustomerSync($customer);
-                $this->syncHandle->setMessageQueueCode('redis');
-                $event[SyncHandle::SESSION_ID] = $this->customerHandle->getCustomerSessionId((int)$customer->getId());
-                $this->syncHandle->synDataToPrime(self::EVENT_REGISTER_CUSTOMER, $customerData, $event);
+                $customerId = $customer->getId();
+                $customerDevice = $this->deviceHandle->getDeviceInfo();
+                $customerProperty = array_merge($customerDevice, $this->customerHandle->processCustomerSync($customer));
+                $this->syncHandle->syncIdentifyToPrime((int)$customerId, $customerProperty);
             } catch (\Exception $exception) {
                 $this->logger->error(
                     self::EVENT_REGISTER_CUSTOMER,

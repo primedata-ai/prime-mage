@@ -17,6 +17,10 @@ class PrimeConfig
      */
     private $primeConfig;
 
+    /**
+     * PrimeConfig constructor.
+     * @param Config $config
+     */
     public function __construct(
         Config $config
     ) {

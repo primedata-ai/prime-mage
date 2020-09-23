@@ -10,4 +10,27 @@
         <observer name="prime_data_customer_account_edited"
                   instance="PrimeData\PrimeDataConnect\Observer\Customer\CustomerUpdateObserver" />
     </event>
+
+    <event name="customer_address_save_after">
+        <observer name="prime_data_after_address_save"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\AfterAddressSaveObserver" />
+    </event>
+
+    <!--- WishList Product -->
+    <event name="wishlist_add_product">
+        <observer name="prime_data_customer_add_wishlist"
+                  instance="PrimeData\PrimeDataConnect\Observer\Customer\AddWishlistObserver" />
+    </event>
+
+    <!-- Review Product -->
+    <event name="review_save_after">
+        <observer name="prime_data_customer_review_product"
+                  instance="PrimeData\PrimeDataConnect\Observer\Products\ReviewProductObserver" />
+    </event>
+
+    <!-- Add To Cart -->
+    <event name="checkout_cart_product_add_after">
+        <observer name="prime_data_add_to_cart_product"
+                  instance="PrimeData\PrimeDataConnect\Observer\Checkout\AddProductObserver" />
+    </event>
 </config>

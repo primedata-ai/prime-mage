@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Model\Tracking;
 
-use Prime\Tracking\Target as PrimeTargetSdk;
+use Prime\Tracking\Source as PrimeSourceSdk;
 
-class PrimeTarget
+class PrimeSource
 {
     /**
      * @var string
@@ -15,7 +15,7 @@ class PrimeTarget
     /**
      * @var string
      */
-    protected $itemId;
+    private $itemId;
 
     /**
      * @var array
@@ -35,7 +35,7 @@ class PrimeTarget
     /**
      * @return string
      */
-    public function getItemType()
+    private function getItemType()
     {
         return $this->itemType;
     }
@@ -53,7 +53,7 @@ class PrimeTarget
     /**
      * @return string
      */
-    public function getItemId()
+    private function getItemId()
     {
         return $this->itemId;
     }
@@ -71,16 +71,16 @@ class PrimeTarget
     /**
      * @return array
      */
-    public function getProperties()
+    private function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * @return PrimeTargetSdk
+     * @return PrimeSourceSdk
      */
-    public function createPrimeTarget()
+    public function createPrimeSource()
     {
-        return new PrimeTargetSdk($this->getItemType(), $this->getItemId(), $this->getProperties());
+        return new PrimeSourceSdk($this->getItemType(), $this->getItemId(), $this->getProperties());
     }
 }

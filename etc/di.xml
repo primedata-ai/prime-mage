@@ -95,11 +95,59 @@
         </arguments>
     </type>
 
+    <virtualType name="SyncCheckoutLoggerHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/PrimeData/SyncCheckout.log</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SyncCheckoutLogger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">SyncCheckoutLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SyncCheckoutLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="PrimeData\PrimeDataConnect\Observer\Checkout\AddProductObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">SyncCheckoutLogger</argument>
+        </arguments>
+    </type>
+
     <type name="PrimeData\PrimeDataConnect\Helper\RedisConfig">
         <arguments>
             <argument name="data" xsi:type="array">
               <item name="message_queue" xsi:type="string">redis</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+            <plugin name="prime_data_plugin_sale_order_repository"
+                type="PrimeData\PrimeDataConnect\Plugin\Sales\OrderRepositoryPlugin" sortOrder="20" disabled="false" />
+    </type>
+
+
+    <virtualType name="SyncOrderLoggerHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/PrimeData/SyncOrder.log</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SyncOrderLogger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">SyncOrderLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SyncOrderLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="PrimeData\PrimeDataConnect\Plugin\Sales\OrderRepositoryPlugin">
+        <arguments>
+            <argument name="logger" xsi:type="object">SyncOrderLogger</argument>
         </arguments>
     </type>
 

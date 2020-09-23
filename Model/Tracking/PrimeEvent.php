@@ -10,11 +10,11 @@ class PrimeEvent
     /**
      * @var string
      */
-    private $eventName = 'default';
+    private $eventName;
     /**
      * @var string
      */
-    private $scope = 'default';
+    private $scope;
     /**
      * @var array
      */
@@ -38,10 +38,12 @@ class PrimeEvent
 
     /**
      * @param string $scope
+     * @return string
      */
     public function setScope(string $scope)
     {
         $this->scope = $scope;
+        return $this;
     }
 
     /**
@@ -49,10 +51,7 @@ class PrimeEvent
      */
     public function getScope()
     {
-        $result = $this->scope;
-        $this->scope = 'default';
-
-        return $result;
+        return $this->scope;
     }
 
     /**
@@ -68,18 +67,17 @@ class PrimeEvent
      */
     public function getEventName()
     {
-        $result = $this->eventName;
-        $this->eventName = 'default';
-
-        return $result;
+        return  $this->eventName;
     }
 
     /**
      * @param array $properties
+     * @return $this
      */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
+        return $this;
     }
 
     /**
@@ -87,9 +85,7 @@ class PrimeEvent
      */
     public function getProperties() :array
     {
-        $result = $this->properties;
-        $this->properties = [];
-        return $result;
+        return  $this->properties;
     }
 
     /**
@@ -102,31 +98,5 @@ class PrimeEvent
         }
         $this->eventSdk = new PrimeEventSdk($this->getEventName(), $this->getScope(), $this->getProperties());
         return $this->eventSdk;
-    }
-
-    /**
-     * @param string $itemId
-     * @param string $itemType
-     * @param array $data
-     */
-    public function setTargetEvent(string $itemId, string $itemType, array $data)
-    {
-        $event = $this->createPrimeEventSdk();
-        $this->primeTarget->setItemId($itemId);
-        $this->primeTarget->setItemType($itemType);
-        $this->primeTarget->setProperties($data);
-        $primeTarget = $this->primeTarget->createPrimeTarget();
-        $event::withTarget($primeTarget);
-    }
-
-    /**
-     * @param string $sessionId
-     */
-    public function setSessionId(string $sessionId)
-    {
-        $event = $this->createPrimeEventSdk();
-        $event::withSessionID($sessionId);
-
-        return $this;
     }
 }

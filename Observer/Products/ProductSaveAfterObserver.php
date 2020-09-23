@@ -62,12 +62,13 @@ class ProductSaveAfterObserver implements ObserverInterface
             /* @var Product $product */
             $product = $observer->getEvent()->getProduct();
             try {
-                $productSyncData = $this->productHandle->processProductSync($product);
-                $this->syncHandle->setMessageQueueCode('redis');
-                $this->syncHandle->synDataToPrime(self::EVENT_UPDATE_CREATE_PRODUCT, $productSyncData);
+                $productTarget = $this->productHandle->getProductSync($product);
+                $sessionId = $this->productHandle->getSessionId();
+                // @TODO: Sync Entity Schema later
+//                $this->syncHandle->synDataToPrime(self::EVENT_UPDATE_CREATE_PRODUCT, $sessionId, $productTarget);
             } catch (\Exception $exception) {
                 $this->logger->error(self::EVENT_UPDATE_CREATE_PRODUCT, [
-                    'error' =>  $exception->getMessage(), 'trace' => $exception->getTraceAsString()
+                    'message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()
                 ]);
             }
         }

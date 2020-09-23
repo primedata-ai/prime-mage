@@ -7,7 +7,6 @@ use Prime\QueueBuffer as PrimeQueueSdkInterface;
 
 /**
  * Interface QueueBufferInterface
- * @package PrimeData\PrimeDataConnect\Model\MessageQueue
  * @api
  * @since 1.0.0
  */

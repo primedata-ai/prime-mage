@@ -87,3 +87,6 @@ while ($run == true) {
     }
 }
 ```
+##Change Log
+1.0.0 innit module add some event to tracking product, customer
+1.1.0 Add more event for tracking add_to_cart, wishlist, review, place_order
