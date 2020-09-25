@@ -1,6 +1,10 @@
 # primedata-connect information
 This module used to sync data from Magento Site to PrimeAi 
 
+#Install
+```shell script
+composer require primedata-ai/prime-mage:1.1.2
+```
 ## Dependency
 This module dependency some library :
 * primedata-ai/analytics-php:v0.3.*
