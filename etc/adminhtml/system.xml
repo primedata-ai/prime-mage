@@ -74,7 +74,7 @@
                     <validate>validate-number</validate>
                 </field>
             </group>
-            <group id="rabbitmq_amqp" translate="label" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="0">
+            <group id="rabbitmq_amqp" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>RabbitMQ AMQP</label>
                 <field id="host" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Host</label>

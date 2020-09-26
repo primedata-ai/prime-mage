@@ -124,6 +124,14 @@
         </arguments>
     </type>
 
+    <type name="PrimeData\PrimeDataConnect\Helper\RabbitMqAMQPConfig">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="message_queue" xsi:type="string">rabbitmq_amqp</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
             <plugin name="prime_data_plugin_sale_order_repository"
                 type="PrimeData\PrimeDataConnect\Plugin\Sales\OrderRepositoryPlugin" sortOrder="20" disabled="false" />
