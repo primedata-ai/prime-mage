@@ -6,12 +6,14 @@ namespace PrimeData\PrimeDataConnect\Model\MessageQueue;
 use Interop\Queue\ConnectionFactory;
 use Interop\Queue\Context;
 use Interop\Queue\Exception;
+use Interop\Queue\Message;
 use Interop\Queue\Producer;
 use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
 
 class QueueBuffer implements QueueBufferInterface
 {
+    const QUEUE_NAME_DEFAULT = 'primedata-events';
     /**
      * @var SerializerInterface
      */
@@ -26,6 +28,8 @@ class QueueBuffer implements QueueBufferInterface
      * @var Producer
      */
     private $producer;
+
+    private $consumer;
 
     /**
      * @var LoggerInterface
@@ -62,8 +66,7 @@ class QueueBuffer implements QueueBufferInterface
      */
     public function sendMessage(string $topic, \JsonSerializable $msg)
     {
-        $queueName = 'enqueue.app.default';
-        $this->queueContext->createQueue($queueName);
+        $this->queueContext->createQueue(self::QUEUE_NAME_DEFAULT);
         $topic = $this->queueContext->createTopic($topic);
         $message = $this->queueContext->createMessage($this->serializer->serialize($msg));
 
@@ -76,5 +79,18 @@ class QueueBuffer implements QueueBufferInterface
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
+    }
+
+    /**
+     * @return Message|null
+     */
+    public function getMessage()
+    {
+        $queue = $this->queueContext->createQueue(self::QUEUE_NAME_DEFAULT);
+        $this->consumer = $this->queueContext->createConsumer($queue);
+        $message = $this->consumer->receive();
+        $this->consumer->acknowledge($message);
+
+        return $message;
     }
 }

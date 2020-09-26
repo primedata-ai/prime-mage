@@ -151,4 +151,13 @@
         </arguments>
     </type>
 
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="prime_sync" xsi:type="object">
+                    PrimeData\PrimeDataConnect\Console\Command\PrimeSync</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>

@@ -18,10 +18,14 @@
             </group>
             <group id="client_prime" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Client Prime</label>
-                <field id="source_id" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="host" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Prime Host</label>
+                    <comment>In case no host is provided, we will send data to 'http://powehi.primedata.ai'</comment>
+                </field>
+                <field id="source_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Source ID</label>
                 </field>
-                <field id="write_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="write_key" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Write Key</label>
                 </field>
             </group>

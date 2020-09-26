@@ -8,6 +8,7 @@ use Magento\Framework\App\Helper\Context;
 
 class Config extends AbstractHelper
 {
+    const PRIME_CLIENT_HOST = 'prime_data_connect/client_prime/host';
     const PRIME_CLIENT_SOURCE_ID = 'prime_data_connect/client_prime/source_id';
     const PRIME_CLIENT_WRITE_KEY = 'prime_data_connect/client_prime/write_key';
     const PRIME_TRANSPORT_CONFIG = 'prime_data_connect/transport/config';
@@ -26,6 +27,14 @@ class Config extends AbstractHelper
     ) {
         $this->data = $data;
         parent::__construct($context);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimeClientHost(): string
+    {
+        return (string)$this->scopeConfig->getValue(self::PRIME_CLIENT_HOST);
     }
 
     /**
