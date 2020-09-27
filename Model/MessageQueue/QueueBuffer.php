@@ -10,6 +10,7 @@ use Interop\Queue\Message;
 use Interop\Queue\Producer;
 use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
+use Enqueue\Util\JSON;
 
 class QueueBuffer implements QueueBufferInterface
 {
@@ -62,13 +63,21 @@ class QueueBuffer implements QueueBufferInterface
     }
 
     /**
+     * @return Context
+     */
+    public function getContext()
+    {
+        return $this->queueContext;
+    }
+
+    /**
      * @inheritDoc
      */
     public function sendMessage(string $topic, \JsonSerializable $msg)
     {
         $this->queueContext->createQueue(self::QUEUE_NAME_DEFAULT);
         $topic = $this->queueContext->createTopic($topic);
-        $message = $this->queueContext->createMessage($this->serializer->serialize($msg));
+        $message = $this->queueContext->createMessage(serialize($msg));
 
         try {
             $this->producer->send($topic, $message);

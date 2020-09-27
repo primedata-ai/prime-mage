@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace PrimeData\PrimeDataConnect\Helper\MessageQueue;
 
 use ErrorException;
+use Interop\Queue\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
-use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Prime\Client;
 use Prime\Tracking\Event;
 use Prime\Tracking\Source;
 use Prime\Tracking\Target;
@@ -25,7 +26,6 @@ class SyncHandle
     const MESSAGE_QUEUE_DEFAULT = 'redis';
     const SCOPE_DEFAULT = 'website';
     const SOURCE_DEFINE = 'site';
-    const LOG_PREFIX = 'Prime_SyncHandle';
 
     /**
      * @var ObjectManagerInterface
@@ -69,9 +69,9 @@ class SyncHandle
      */
     private $deviceHandler;
     /**
-     * @var SerializerInterface
+     * @var Client
      */
-    private $serializer;
+    private $client;
 
     /**
      * SyncHandle constructor.
@@ -92,7 +92,6 @@ class SyncHandle
         StoreManagerInterface $storeManager,
         PrimeHelperConfig $helperConfig,
         DeviceHandle $deviceHandle,
-        SerializerInterface $serializer,
         LoggerInterface $logger
     ) {
         $this->objectManager = $objectManager;
@@ -101,13 +100,29 @@ class SyncHandle
         $this->primeConfig = $primeConfig;
         $this->queueBuffer = $queueBuffer;
         $this->storeManager = $storeManager;
-        $this->serializer = $serializer;
         $this->logger = $logger;
 
         $messageConfig = $helperConfig->getTransport();
         $this->queueConnect = $this->getMessageQueueConnect($messageConfig);
         $connect = $this->queueConnect->getConnection();
         $this->queueManage = $this->queueBuffer->createQueueManage($connect);
+        $this->client = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+    }
+
+    /**
+     * @return Client
+     */
+    public function getPrimeClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @return Context
+     */
+    public function getContext()
+    {
+        return $this->queueManage->getContext();
     }
 
     /**
@@ -151,8 +166,8 @@ class SyncHandle
             throw new ErrorException('Missing UserId event to sync');
         }
 
-        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
         $source = $this->createPrimeSource();
+        $primeClient = $this->getPrimeClient();
         $primeClient->track(
             $eventName,
             $properties,
@@ -178,54 +193,8 @@ class SyncHandle
             throw new ErrorException('Missing data to sync');
         }
 
-        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+        $primeClient = $this->getPrimeClient();
         $primeClient->identify($customerId, $data);
-    }
-
-    public function sendDataToPrime()
-    {
-        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
-        $message = $this->queueManage->getMessage();
-        $body = $message->getBody();
-        $eventData = $this->serializer->unserialize($body);
-        try {
-            $event = $this->convertToEvent($eventData);
-            // Because the sync using Event Object so we need convert the array to event Object
-            $primeClient->sync($event);
-        } catch (ErrorException $e) {
-            $this->logger->error(self::LOG_PREFIX, [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString()
-            ]);
-        }
-    }
-
-    /**
-     * @param array $eventData
-     * @return Event
-     * @throws ErrorException
-     */
-    protected function convertToEvent(array $eventData)
-    {
-        if (!$eventData['events'][0]) {
-            throw new ErrorException('Not have Prime Event Data');
-        }
-
-        $event =$eventData['events'][0];
-
-        if (!$event['eventType']) {
-            throw new ErrorException('Missing Prime eventType');
-        }
-
-        if (!$event['scope']) {
-            throw new ErrorException('Missing Prime scope');
-        }
-
-        return new Event(
-            $event['eventType'],
-            $event['scope'],
-            $event
-        );
     }
 
     /**
