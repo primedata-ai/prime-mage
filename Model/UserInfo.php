@@ -12,7 +12,7 @@ class UserInfo
      */
     public function getUserID()
     {
-        return $this->userID;
+        return strval($this->userID);
     }
 
     /**
@@ -20,7 +20,7 @@ class UserInfo
      */
     public function getSessionID()
     {
-        return $this->sessionID;
+        return strval($this->sessionID);
     }
 
     /**
@@ -28,7 +28,7 @@ class UserInfo
      * @param string $userID
      * @param string $sessionID
      */
-    public function __construct(string $userID, string $sessionID)
+    public function __construct($userID, $sessionID)
     {
         $this->userID = $userID;
         $this->sessionID = $sessionID;
