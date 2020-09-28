@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace PrimeData\PrimeDataConnect\Helper\MessageQueue;
 
+use ErrorException;
+use Interop\Queue\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Prime\Client;
 use Prime\Tracking\Event;
 use Prime\Tracking\Source;
 use Prime\Tracking\Target;
@@ -65,6 +68,10 @@ class SyncHandle
      * @var DeviceHandle
      */
     private $deviceHandler;
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
      * SyncHandle constructor.
@@ -99,6 +106,23 @@ class SyncHandle
         $this->queueConnect = $this->getMessageQueueConnect($messageConfig);
         $connect = $this->queueConnect->getConnection();
         $this->queueManage = $this->queueBuffer->createQueueManage($connect);
+        $this->client = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+    }
+
+    /**
+     * @return Client
+     */
+    public function getPrimeClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @return Context
+     */
+    public function getContext()
+    {
+        return $this->queueManage->getContext();
     }
 
     /**
@@ -124,7 +148,7 @@ class SyncHandle
      * @param Target $target
      * @param array $properties
      * @param string $sessionId
-     * @throws \ErrorException
+     * @throws ErrorException
      * @throws NoSuchEntityException
      */
     public function synDataToPrime(
@@ -135,15 +159,15 @@ class SyncHandle
         string $sessionId = ""
     ) {
         if (!$eventName) {
-            throw new \ErrorException('Missing Event Name');
+            throw new ErrorException('Missing Event Name');
         }
 
-        if (!$sessionId) {
-            throw new \ErrorException('Missing Session Id event to sync');
+        if (!$userId) {
+            throw new ErrorException('Missing UserId event to sync');
         }
 
-        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
         $source = $this->createPrimeSource();
+        $primeClient = $this->getPrimeClient();
         $primeClient->track(
             $eventName,
             $properties,
@@ -157,19 +181,19 @@ class SyncHandle
     /**
      * @param int $customerId
      * @param array $data
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function syncIdentifyToPrime(int $customerId, array $data)
     {
         if (!$customerId) {
-            throw new \ErrorException('Missing Customer Id');
+            throw new ErrorException('Missing Customer Id');
         }
 
         if (!$data) {
-            throw new \ErrorException('Missing data to sync');
+            throw new ErrorException('Missing data to sync');
         }
 
-        $primeClient = $this->primeClient->setQueueBuffer($this->queueManage)->getPrimeClient();
+        $primeClient = $this->getPrimeClient();
         $primeClient->identify($customerId, $data);
     }
 

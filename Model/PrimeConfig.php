@@ -27,7 +27,8 @@ class PrimeConfig
         $this->config = $config;
         $this->primeConfig = new PrimeConfigSdk(
             $this->config->getPrimeClientSourceId(),
-            $this->config->getPrimeClientWriteKey()
+            $this->config->getPrimeClientWriteKey(),
+            $this->config->getPrimeClientHost()
         );
     }
 

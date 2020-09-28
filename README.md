@@ -17,6 +17,11 @@ Go to Store -> PrimeData
 * Config Transport: 'Redis' 
 * Config Prime Client
 * Setup information for 'Redis'.
+* To run consumer get data and sync to PrimeData Ai. Please run the command.
+```
+php bin/magento prime:sync
+```
+
 ## To test function
 ###  example for procedure
 ```php
@@ -94,3 +99,4 @@ while ($run == true) {
 ##Change Log
 1.0.0 innit module add some event to tracking product, customer
 1.1.0 Add more event for tracking add_to_cart, wishlist, review, place_order
+1.1.4 Add Prime Host, add Command to consume data and send it to primeAI
