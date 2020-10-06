@@ -71,7 +71,7 @@ class QueueBuffer implements QueueBufferInterface
 
     /**
      * @inheritDoc
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendMessage(string $topic, \JsonSerializable $msg)
     {
@@ -82,11 +82,11 @@ class QueueBuffer implements QueueBufferInterface
         try {
             $this->queueContext->createProducer()->send($queue, $message);
         } catch (InvalidDestinationException $e) {
-            throw new \Exception($e->getMessage());
+            throw $e;
         } catch (InvalidMessageException $e) {
-            throw new \Exception($e->getMessage());
+            throw $e;
         } catch (Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw $e;
         }
     }
 
