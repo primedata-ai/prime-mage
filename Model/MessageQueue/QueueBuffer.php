@@ -6,11 +6,12 @@ namespace PrimeData\PrimeDataConnect\Model\MessageQueue;
 use Interop\Queue\ConnectionFactory;
 use Interop\Queue\Context;
 use Interop\Queue\Exception;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use Interop\Queue\Message;
 use Interop\Queue\Producer;
 use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
-use Enqueue\Util\JSON;
 
 class QueueBuffer implements QueueBufferInterface
 {
@@ -57,8 +58,6 @@ class QueueBuffer implements QueueBufferInterface
     public function createQueueManage(ConnectionFactory $queueConnection)
     {
         $this->queueContext = $queueConnection->createContext();
-        $this->producer = $this->queueContext->createProducer();
-
         return $this;
     }
 
@@ -72,21 +71,22 @@ class QueueBuffer implements QueueBufferInterface
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function sendMessage(string $topic, \JsonSerializable $msg)
     {
-        $this->queueContext->createQueue(self::QUEUE_NAME_DEFAULT);
-        $topic = $this->queueContext->createTopic($topic);
+        $queue = $this->queueContext->createQueue(self::QUEUE_NAME_DEFAULT);
+        $this->queueContext->createTopic($topic);
         $message = $this->queueContext->createMessage(serialize($msg));
 
         try {
-            $this->producer->send($topic, $message);
-        } catch (Exception\InvalidDestinationException $e) {
-            $this->logger->error($e->getMessage());
-        } catch (Exception\InvalidMessageException $e) {
-            $this->logger->error($e->getMessage());
+            $this->queueContext->createProducer()->send($queue, $message);
+        } catch (InvalidDestinationException $e) {
+            throw new \Exception($e->getMessage());
+        } catch (InvalidMessageException $e) {
+            throw new \Exception($e->getMessage());
         } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 

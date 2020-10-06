@@ -13,6 +13,7 @@ use Prime\Tracking\Event;
 use Prime\Tracking\Source;
 use Prime\Tracking\Target;
 use PrimeData\PrimeDataConnect\Helper\Config as PrimeHelperConfig;
+use PrimeData\PrimeDataConnect\Helper\RabbitMqAMQPConfig;
 use PrimeData\PrimeDataConnect\Helper\RedisConfig;
 use PrimeData\PrimeDataConnect\Model\MessageQueue\QueueBuffer;
 use PrimeData\PrimeDataConnect\Model\PrimeClient;
@@ -26,6 +27,7 @@ class SyncHandle
     const MESSAGE_QUEUE_DEFAULT = 'redis';
     const SCOPE_DEFAULT = 'website';
     const SOURCE_DEFINE = 'site';
+    const MESSAGE_QUEUE_RABBIT_AMQP = 'rabbitmq_amqp';
 
     /**
      * @var ObjectManagerInterface
@@ -134,6 +136,9 @@ class SyncHandle
         switch ($transport) {
             case self::MESSAGE_QUEUE_DEFAULT:
                 $this->queueConnect = $this->objectManager->create(RedisConfig::class);
+                break;
+            case self::MESSAGE_QUEUE_RABBIT_AMQP:
+                $this->queueConnect = $this->objectManager->create(RabbitMqAMQPConfig::class);
                 break;
             default:
                 $this->queueConnect = $this->objectManager->create(RedisConfig::class);
