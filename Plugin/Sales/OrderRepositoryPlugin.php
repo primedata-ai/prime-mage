@@ -5,6 +5,7 @@ namespace PrimeData\PrimeDataConnect\Plugin\Sales;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use PrimeData\PrimeDataConnect\Helper\MessageQueue\SyncHandle;
 use PrimeData\PrimeDataConnect\Helper\SyncConfig;
 use PrimeData\PrimeDataConnect\Model\ProcessData\SalesOrderHandle;
@@ -31,23 +32,31 @@ class OrderRepositoryPlugin
     protected $saleOrderHandle;
 
     /**
-     * AddProductObserver constructor.
+     * @var CookieManagerInterface
+     */
+    protected $cookieManager;
+
+    /**
+     * OrderRepositoryPlugin constructor.
      * @param SyncConfig $config
      * @param LoggerInterface $logger
      * @param SalesOrderHandle $saleOrderHandle
      * @param SyncHandle $syncHandle
+     * @param CookieManagerInterface $cookieManager
      * @codeCoverageIgnore
      */
     public function __construct(
         SyncConfig $config,
         LoggerInterface $logger,
         SalesOrderHandle $saleOrderHandle,
-        SyncHandle $syncHandle
+        SyncHandle $syncHandle,
+        CookieManagerInterface $cookieManager
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->saleOrderHandle = $saleOrderHandle;
         $this->syncHandle = $syncHandle;
+        $this->cookieManger = $cookieManager;
     }
 
     /**
@@ -75,12 +84,14 @@ class OrderRepositoryPlugin
             $targetOrder = $this->saleOrderHandle->processOrderData($order);
             $properties = $this->saleOrderHandle->getOrderProperties($order);
             $profile = $this->saleOrderHandle->getProfile($order);
+            $cookieXSessionId = $this->cookieManger->getCookie('XSessionId');
+            $sessionId = ($cookieXSessionId)? $cookieXSessionId : $profile->getSessionID();
             $this->syncHandle->synDataToPrime(
                 self::EVENT_SYNC,
                 (string)$profile->getUserID(),
                 $targetOrder,
                 $properties,
-                $profile->getSessionID()
+                $sessionId
             );
         } catch (\Exception $e) {
             $this->logger->error(self::EVENT_SYNC, [
