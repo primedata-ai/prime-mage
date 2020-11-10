@@ -15,7 +15,7 @@
       "enqueue/enqueue": "0.9.2"
   },
   "license": [
-    "Open Software License (OSL)"
+    "proprietary"
   ],
   "autoload": {
     "files": [
