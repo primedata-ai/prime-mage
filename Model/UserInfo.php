@@ -12,7 +12,7 @@ class UserInfo
      */
     public function getUserID()
     {
-        return strval($this->userID);
+        return (string)$this->userID;
     }
 
     /**
@@ -20,7 +20,7 @@ class UserInfo
      */
     public function getSessionID()
     {
-        return strval($this->sessionID);
+        return (string)$this->sessionID;
     }
 
     /**
