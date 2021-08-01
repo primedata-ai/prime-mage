@@ -20,7 +20,7 @@
                 <label>Client Prime</label>
                 <field id="host" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Prime Host</label>
-                    <comment>In case no host is provided, we will send data to 'http://powehi.primedata.ai'</comment>
+                    <comment>In case no host is provided, we will send data to 'https://dev.primedata.ai/powehi'</comment>
                 </field>
                 <field id="source_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Source ID</label>
